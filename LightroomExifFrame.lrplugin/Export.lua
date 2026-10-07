@@ -1,5 +1,6 @@
 local LrDialogs = import 'LrDialogs'
 local LrFileUtils = import 'LrFileUtils'
+local LrProgressScope = import 'LrProgressScope'
 local LrTasks = import 'LrTasks'
 local LrView = import 'LrView'
 local Frame = require 'Frame'
@@ -142,25 +143,43 @@ function Export.processRenderedPhotos(context, exportContext)
     if err then error(err) end
     local created, createMessage = LrFileUtils.createAllDirectories(p.ef_outputFolder)
     assert(created, createMessage)
-    local progress = exportContext:configureProgress {title = T('Exporting EXIF Frame','EXIF Frame 내보내기'), renderPortion = 0.5}
+    local title = T('Exporting EXIF Frame','EXIF Frame 내보내기')
+    local renderProgress = exportContext:configureProgress {title = title, renderPortion = 1}
+    -- Lightroom can finish/dismiss its render scope while our external helper is
+    -- still running. Keep a separate visible scope alive for the complete batch.
+    local progress = LrProgressScope {title = title, functionContext = context}
     progress:setCancelable(true)
-    local completed, warnings = 0, {}
-    for _, rendition in exportContext:renditions {stopIfCanceled = true} do
+    renderProgress:setCancelable(true)
+    local total = math.max(1, exportContext.exportSession:countRenditions())
+    progress:setPortionComplete(0, total)
+    local completed, processed, warnings = 0, 0, {}
+    for _, rendition in exportContext:renditions {progressScope = renderProgress, stopIfCanceled = true} do
+        if progress:isCanceled() or renderProgress:isCanceled() then
+            progress:cancel(); renderProgress:cancel(); break
+        end
         local rendered, path = rendition:waitForRender()
         if rendered then
             -- ponytail: cancel between photos; finish this helper call before taking the next rendition.
-            if not progress:isCanceled() then
+            if not progress:isCanceled() and not renderProgress:isCanceled() then
                 progress:setCaption(T('Framing ','프레임 합성 중: ') .. tostring(path))
-                local ok, result = LrTasks.pcall(function()
-                    return Frame.run(p, rendition.photo, path, Frame.temporary(context), false)
-                end)
-                if ok then
-                    completed = completed + 1
-                    for _, warning in ipairs(result.warnings or {}) do warnings[#warnings + 1] = tostring(warning) end
-                else rendition:uploadFailed(tostring(result)) end
+                LrTasks.yield() -- Let Lightroom paint the scope before launching the helper.
+                if not progress:isCanceled() and not renderProgress:isCanceled() then
+                    local ok, result = LrTasks.pcall(function()
+                        return Frame.run(p, rendition.photo, path, Frame.temporary(context), false)
+                    end)
+                    if ok then
+                        completed = completed + 1
+                        for _, warning in ipairs(result.warnings or {}) do warnings[#warnings + 1] = tostring(warning) end
+                    else rendition:uploadFailed(tostring(result)) end
+                end
             end
             LrFileUtils.delete(path)
         else rendition:uploadFailed(tostring(path)) end
+        processed = processed + 1
+        progress:setPortionComplete(processed, total)
+        if progress:isCanceled() or renderProgress:isCanceled() then
+            progress:cancel(); renderProgress:cancel(); break
+        end
     end
     if progress:isCanceled() then
         LrDialogs.message('EXIF Frame', T('Canceled after finishing the current photo. Saved files: ',
@@ -171,5 +190,6 @@ function Export.processRenderedPhotos(context, exportContext)
         LrDialogs.message('EXIF Frame', T('Export warnings:\n','내보내기 참고 사항:\n') .. table.concat(warnings, '\n'), 'warning')
     end
     progress:done()
+    renderProgress:done()
 end
 return Export

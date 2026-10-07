@@ -44,12 +44,17 @@ local factory = setmetatable({}, {__index = function(_,kind)
     if kind == 'control_spacing' or kind == 'label_spacing' then return function() return 6 end end
     return function(_,args) args.kind = kind; return args end
 end})
-local progress = {canceled=false}
-function progress:setCancelable() end
-function progress:setCaption() end
-function progress:isCanceled() return self.canceled end
-function progress:done() self.finished = true end
-PROGRESS = progress
+local function makeProgress()
+    local p = {canceled=false,portions={}}
+    function p:setCancelable(value) self.cancelable=value end
+    function p:setCaption(value) self.caption=value end
+    function p:setPortionComplete(done,total) self.portions[#self.portions+1]={done,total} end
+    function p:isCanceled() return self.canceled end
+    function p:cancel() self.canceled=true end
+    function p:done() self.finished=true end
+    return p
+end
+PROGRESS = makeProgress(); RENDER_PROGRESS = makeProgress()
 local photo = {}
 function photo:getRawMetadata(key)
     local data = {isoSpeedRating=200,aperture=2.8,shutterSpeed=1/800,focalLength=50,
@@ -80,7 +85,11 @@ local sdk = {
     end},
     LrLocalization={currentLanguage=function() return LANGUAGE or 'en' end},
     LrPathUtils=paths, LrPrefs={prefsForPlugin=function() return prefs end},
-    LrTasks={pcall=pcall,execute=py_execute},
+    LrProgressScope=function(args) PROGRESS_ARGS=args; return PROGRESS end,
+    LrTasks={pcall=pcall,execute=py_execute,yield=function()
+        YIELD_COUNT=(YIELD_COUNT or 0)+1
+        if CANCEL_AT_YIELD then PROGRESS:cancel() end
+    end},
     LrView={osFactory=function() return factory end,bind=function(value) return {binding=value} end},
 }
 function import(name) return assert(sdk[name], 'Unknown SDK namespace: '..name) end
@@ -296,18 +305,79 @@ class LuaTests(unittest.TestCase):
             local e=require('Export');local c=CONTEXT();local p=SETTINGS()
             local rendition={photo=PHOTO,waitForRender=function() return true,INPUT_PATH end,
                 uploadFailed=function() error('Unexpected export failure') end}
-            local ec={propertyTable=p,configureProgress=function() return PROGRESS end}
+            local ec={propertyTable=p,configureProgress=function() return RENDER_PROGRESS end,
+                exportSession={countRenditions=function() return 2 end}}
             function ec:renditions(options)
+                assert(options.progressScope==RENDER_PROGRESS)
                 local n=0
                 return function()
-                    if options.stopIfCanceled and PROGRESS.canceled then return nil end
+                    if options.stopIfCanceled and options.progressScope.canceled then return nil end
                     n=n+1;if n<=2 then return n,rendition end
                 end
             end
-            e.processRenderedPhotos(c,ec);assert(PROGRESS.finished);c:cleanup()
+            e.processRenderedPhotos(c,ec)
+            assert(PROGRESS.finished and RENDER_PROGRESS.finished and RENDER_PROGRESS.canceled)
+            assert(PROGRESS_ARGS.functionContext==c and PROGRESS.cancelable and YIELD_COUNT==1)
+            assert(PROGRESS.portions[#PROGRESS.portions][1]==1)
+            c:cleanup()
         ''')
         self.assertEqual(len(self.jobs), 1)
         self.assertTrue(Path(self.jobs[0]["output_path"]).is_file())
+
+    def test_visible_batch_progress_remains_until_all_helpers_complete(self):
+        self.lua.execute('''
+            local e=require('Export');local c=CONTEXT();local p=SETTINGS()
+            local rendition={photo=PHOTO,waitForRender=function() return true,INPUT_PATH end,
+                uploadFailed=function(message) error(message) end}
+            local ec={propertyTable=p,configureProgress=function() return RENDER_PROGRESS end,
+                exportSession={countRenditions=function() return 2 end}}
+            function ec:renditions(options)
+                assert(options.progressScope==RENDER_PROGRESS and options.stopIfCanceled)
+                local n=0
+                return function()
+                    assert(not PROGRESS.finished)
+                    n=n+1;if n<=2 then return n,rendition end
+                end
+            end
+            e.processRenderedPhotos(c,ec)
+            assert(PROGRESS.finished and RENDER_PROGRESS.finished and not PROGRESS.canceled)
+            assert(PROGRESS.portions[1][1]==0 and PROGRESS.portions[1][2]==2)
+            assert(PROGRESS.portions[2][1]==1 and PROGRESS.portions[3][1]==2)
+            assert(YIELD_COUNT==2);c:cleanup()
+        ''')
+        self.assertEqual(len(self.jobs), 2)
+
+    def test_job_passes_explicit_native_person_removal_policy(self):
+        self.lua.execute('''
+            local f=require('Frame');local c=CONTEXT();local p=SETTINGS()
+            p.LR_removeFaceMetadata=true;f.run(p,PHOTO,INPUT_PATH,f.temporary(c),false)
+            p.LR_removeFaceMetadata=false;f.run(p,PHOTO,INPUT_PATH,f.temporary(c),false)
+            c:cleanup()
+        ''')
+        self.assertIs(self.jobs[0]["remove_person_info"], True)
+        self.assertIs(self.jobs[1]["remove_person_info"], False)
+
+    def test_cancel_when_progress_paints_skips_unstarted_helper(self):
+        self.lua.execute('''
+            CANCEL_AT_YIELD=true
+            local e=require('Export');local c=CONTEXT();local p=SETTINGS()
+            local rendition={photo=PHOTO,waitForRender=function() return true,INPUT_PATH end,
+                uploadFailed=function(message) error(message) end}
+            local ec={propertyTable=p,configureProgress=function() return RENDER_PROGRESS end,
+                exportSession={countRenditions=function() return 2 end}}
+            function ec:renditions(options)
+                local n=0
+                return function()
+                    if options.progressScope:isCanceled() then return nil end
+                    n=n+1;if n<=2 then return n,rendition end
+                end
+            end
+            e.processRenderedPhotos(c,ec)
+            assert(PROGRESS.finished and PROGRESS.canceled and RENDER_PROGRESS.canceled)
+            c:cleanup()
+        ''')
+        self.assertEqual(len(self.jobs), 0)
+        self.assertFalse(self.input.exists())
 
 
 if __name__ == "__main__":

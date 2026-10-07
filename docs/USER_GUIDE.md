@@ -108,6 +108,10 @@ Lightroom의 메타데이터 설정이 최종 파일의 **출발점**입니다. 
 
 Lightroom's metadata settings define the **starting point**. GPS removal, person-information exclusion, copyright-only export, and other policies are applied to the temporary TIFF first. The helper copies EXIF/IPTC/XMP only from that TIFF and does not restore tags from the original photo.
 
+Lightroom 15.6 검사에서 **인물 정보 제거**를 켜도 임시 TIFF의 `PersonInImage`가 남았습니다. 따라서 이 설정을 켠 경우 플러그인은 최종 파일의 명시적인 인물 이름·상세 정보 및 MWG/Microsoft 얼굴 영역 태그를 추가로 제거합니다. 캡션·작가명·일반 키워드에 적힌 이름을 추측하여 지우지는 않습니다. [검증 기록](VALIDATION.md)에 Lightroom 단계와 최종 출력 검사를 구분했습니다.
+
+In the Lightroom 15.6 test, **Remove Person Info** left `PersonInImage` in the temporary TIFF. When that option is enabled, the plug-in additionally removes explicit person-name/details and MWG/Microsoft face-region tags from the final file. It does not guess which words in captions, artist names, or ordinary keywords identify people. The [validation record](VALIDATION.md) separates Lightroom's behavior from final-output checks.
+
 사진 바깥에 보이는 EXIF 텍스트는 카탈로그 촬영 정보입니다. 내부 메타데이터를 제거해도 기본 프레임에는 촬영 정보가 보일 수 있습니다. 그 정보를 결과 이미지에 표시하지 않으려면 해당 템플릿을 비우거나 None을 선택하세요. 사용자 아티스트 입력도 화면에만 적용됩니다.
 
 Visible frame text comes from catalog capture information. Removing embedded metadata can still leave capture information visible in the default frame. Clear the relevant templates or choose None to omit it from the image itself. The artist entry also affects visible text only.
@@ -132,15 +136,16 @@ The renderer manages ICC independently of metadata copying. Check PNG/WebP metad
 
 Preview rerenders one selected target photo through Lightroom with current sizing, sharpening, and metadata policy. It uses the same composition code as export, then converts the display to an sRGB 8-bit PNG capped at 600 px. Text layout is calculated at the actual body size before reduction. Preview does not replace checking the final file's bit depth, profile, or metadata.
 
-배치 취소는 다음 사진으로 넘어가기 전에 적용됩니다. 이미 실행 중인 외부 합성 작업을 강제로 종료하지 않으므로 취소 후 현재 사진이 완성될 수 있습니다. Lightroom 렌더링 실패와 합성 실패는 내보내기 오류로 보고합니다. 텍스트 축소·영역 생략 등 경고는 내보내기 후 요약합니다.
+배치 취소는 다음 사진으로 넘어가기 전에 적용됩니다. 이미 실행 중인 외부 합성 작업을 강제로 종료하지 않으므로 취소 후 현재 사진이 완성될 수 있습니다. Lightroom 렌더링 실패와 합성 실패는 내보내기 오류로 보고합니다. 영역 생략·메타데이터 변환 등 경고는 내보내기 후 요약합니다.
 
-Batch cancellation takes effect before the next photo. An external renderer already processing a photo is allowed to finish, so that photo may be saved after cancellation. Lightroom-render and helper failures are reported as export errors; layout and metadata warnings are summarized afterward.
+Batch cancellation takes effect before the next photo. An external renderer already processing a photo is allowed to finish, so that photo may be saved after cancellation. Lightroom-render and helper failures are reported as export errors; omitted text and metadata warnings are summarized afterward.
 
 ## 문제 확인 · Troubleshooting
 
 | 증상 · Symptom | 확인 · Check |
 |---|---|
 | 실행 파일 누락 · Missing helper | ZIP의 `.lrplugin` 전체를 다시 풉니다. 플러그인 관리자의 진단 버튼으로 경로를 확인합니다. / Extract the complete `.lrplugin`; inspect paths with the manager's diagnostics button. |
+| 실행 경로 문자 오류 · Unsupported launch path | `.lrplugin` 설치 경로와 Windows 임시 폴더 경로에는 `%`, `!`를 사용하지 마세요. Lightroom의 셸 실행 경계에서 거부합니다. 사진·로고·출력 경로는 JSON으로 전달되므로 이 제한을 받지 않습니다. / Avoid `%` and `!` in the plug-in installation and Windows temporary paths. Lightroom's shell-launch boundary rejects them; photo, logo, and output paths are passed in JSON and do not have this restriction. |
 | 한글 글자가 비어 있음 · Missing glyphs | 해당 문자를 포함한 로컬 글꼴을 선택합니다. / Select a local font containing the required glyphs. |
 | 로고 오류 · Logo error | 등록 파일이 존재하는지, 실제 PNG인지 확인하고 다시 등록합니다. / Check that the registered file exists and is a genuine PNG, then register it again. |
 | 글자가 작거나 생략됨 · Small/omitted text | 띠를 높이거나 템플릿을 줄입니다. 미리보기 경고를 확인합니다. / Increase footer height or shorten templates; inspect preview warnings. |

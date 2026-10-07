@@ -12,7 +12,8 @@ the job path; user text never appears on a shell command line.
   "result_path": "C:/work/result.json",
   "source_path": "C:/photos/original.dng",
   "preview": false,
-  "preview_max_size": 1200,
+  "remove_person_info": false,
+  "preview_max_size": 600,
   "format": "webp",
   "quality": 95,
   "lossless": false,
@@ -44,6 +45,13 @@ source_path is optional and may only supply missing *visible* frame fields.
 Preview input must also be a Lightroom-rendered TIFF; preview output is sRGB8
 PNG but layout is computed at the input's actual size before downsampling.
 
+`remove_person_info` is an optional boolean, default false. Lua passes the native
+`LR_removeFaceMetadata` choice. When true, the metadata module additionally removes
+typed person/face-region metadata that Lightroom may leave in the rendered TIFF.
+This does not modify the TIFF or original file, and does not heuristically remove
+names from captions, creator contacts, or ordinary keywords. Upstream Lightroom
+exclusion failures and final-output privacy enforcement must be reported separately.
+
 Helper dependencies next to EXE: `imagemagick/magick.exe`,
 `exiftool/exiftool.exe` and its official support files. Development overrides:
 `EXIF_FRAME_MAGICK`, `EXIF_FRAME_EXIFTOOL` absolute paths.
@@ -58,7 +66,7 @@ Metadata module interface:
 `read_display_metadata(source: pathlib.Path, exiftool: pathlib.Path) -> dict[str,str]`;
 `copy_metadata(source: pathlib.Path, destination: pathlib.Path, *, exiftool: pathlib.Path,
 format: str, width: int, height: int, body_width: int, body_height: int,
-offset_x: int, offset_y: int) -> list[str]`.
+offset_x: int, offset_y: int, remove_person_info: bool = False) -> list[str]`.
 Returns warnings; raises on metadata failure. Renderer owns ICC and pixels;
 metadata module must not overwrite ICC. Renderer strips metadata from its
 intermediates before copying only the Lightroom-filtered metadata.

@@ -38,26 +38,67 @@ _IPTC_ENVELOPE_TAGS = {
 }
 
 
-def _run(exiftool: pathlib.Path, *args: str,
-         cwd: pathlib.Path | None = None) -> subprocess.CompletedProcess[str]:
-    command = [str(exiftool), "-config", "", "-charset", "filename=UTF8", *args]
-    kwargs: dict[str, Any] = {
-        "capture_output": True,
-        "text": True,
-        "encoding": "utf-8",
-        "errors": "replace",
-        "check": False,
-        "timeout": 180,
-    }
+def run_exiftool(exiftool: pathlib.Path, *args: str, cwd: pathlib.Path | None = None,
+                 binary: bool = False) -> subprocess.CompletedProcess:
+    """Run ExifTool through a UTF-8 argfile so Windows paths bypass the ACP."""
+    # ExifTool recommends a UTF-8 -@ file on Windows because Unicode paths
+    # passed directly on the command line are recoded through the active code page.
+    filtered: list[str] = []
+    skip_config_value = False
+    for arg in args:
+        if skip_config_value:
+            if arg:
+                raise ValueError("ExifTool configuration must remain disabled")
+            skip_config_value = False
+            continue
+        if arg == "-config":
+            skip_config_value = True
+            continue
+        if arg == "-config=":
+            continue
+        if "\n" in arg or "\r" in arg:
+            raise ValueError("ExifTool arguments cannot contain line breaks")
+        filtered.append(str(arg))
+    if skip_config_value:
+        raise ValueError("ExifTool configuration must remain disabled")
+
+    executable = str(pathlib.Path(exiftool).resolve())
     env = os.environ.copy()
     env.update({"LANG": "C", "LC_ALL": "C"})
-    kwargs["env"] = env
+    command_prefix = [executable, "-config", "", "-charset", "filename=UTF8", "-@"]
+    kwargs: dict[str, Any] = {
+        "capture_output": True,
+        "text": not binary,
+        "check": False,
+        "timeout": 180,
+        "env": env,
+    }
+    if not binary:
+        kwargs.update({"encoding": "utf-8", "errors": "replace"})
     if os.name == "nt":
         kwargs["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
-    try:
-        result = subprocess.run(command, cwd=cwd, **kwargs)
-    except subprocess.TimeoutExpired as exc:
-        raise RuntimeError("ExifTool timed out after 180 seconds") from exc
+
+    def invoke(directory: pathlib.Path, args_file: pathlib.Path) -> subprocess.CompletedProcess:
+        args_file.write_text("\n".join(filtered) + "\n", encoding="utf-8", newline="\n")
+        try:
+            return subprocess.run([*command_prefix, args_file.name], cwd=directory, **kwargs)
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError("ExifTool timed out after 180 seconds") from exc
+        finally:
+            args_file.unlink(missing_ok=True)
+
+    if cwd is not None:
+        directory = pathlib.Path(cwd).resolve()
+        with tempfile.NamedTemporaryFile(dir=directory, prefix="exiftool-", suffix=".args", delete=False) as stream:
+            args_file = pathlib.Path(stream.name)
+        # Use only its ASCII basename in the command line. All path arguments
+        # in this mode are relative to the same directory by design or absolute.
+        result = invoke(directory, args_file)
+    else:
+        with tempfile.TemporaryDirectory(prefix="exiftool-args-") as temp_dir:
+            directory = pathlib.Path(temp_dir)
+            args_file = directory / "metadata.args"
+            result = invoke(directory, args_file)
     if result.returncode:
         detail = (result.stderr or result.stdout).strip()
         raise RuntimeError(f"ExifTool failed ({result.returncode}): {detail or 'unknown error'}")
@@ -67,8 +108,11 @@ def _run(exiftool: pathlib.Path, *args: str,
     return result
 
 
+_run = run_exiftool
+
+
 def _read(source: pathlib.Path, exiftool: pathlib.Path) -> dict[str, Any]:
-    result = _run(exiftool, "-j", "-G1", "-a", "-s", "-struct", "-n", str(source))
+    result = _run(exiftool, "-j", "-G1", "-a", "-s", "-struct", "-n", str(pathlib.Path(source).resolve()))
     try:
         data = json.loads(result.stdout)
         return data[0] if data else {}
@@ -223,11 +267,20 @@ def _iptc_args_file(exiftool: pathlib.Path) -> pathlib.Path:
 
 def _warn_unmapped_iptc(args_file: pathlib.Path, tags: dict[str, Any]) -> list[str]:
     mapped = set()
+    composite_sources = set()
     for line in args_file.read_text(encoding="utf-8").splitlines():
         if "<" in line:
             source = line.rsplit("<", 1)[1].strip()
             if source.startswith("IPTC:"):
                 mapped.add(source.rsplit(":", 1)[-1])
+            elif source.startswith("Composite:"):
+                composite_sources.add(source.rsplit(":", 1)[-1])
+    # These ExifTool composite fields are built from the paired IPTC date
+    # and time fields, then copied by the pinned mapping file.
+    if "DateTimeCreated" in composite_sources:
+        mapped.update(("DateCreated", "TimeCreated"))
+    if "DigitalCreationDateTime" in composite_sources:
+        mapped.update(("DigitalCreationDate", "DigitalCreationTime"))
     return [
         f"WebP IPTC field not mapped to XMP: {key}"
         for key in tags
@@ -239,7 +292,7 @@ def _warn_unmapped_iptc(args_file: pathlib.Path, tags: dict[str, Any]) -> list[s
 def _copy_metadata(source: pathlib.Path, copy_source: pathlib.Path, destination: pathlib.Path, *,
                    exiftool: pathlib.Path, format: str, width: int, height: int,
                    body_width: int, body_height: int, offset_x: int, offset_y: int,
-                   copy_cwd: pathlib.Path | None = None) -> list[str]:
+                   copy_cwd: pathlib.Path | None = None, remove_person_info: bool = False) -> list[str]:
     """Copy Lightroom-filtered metadata while keeping renderer pixels and ICC intact."""
     source, destination, exiftool = map(pathlib.Path, (source, destination, exiftool))
     if format not in {"jpg", "png", "webp"}:
@@ -248,14 +301,22 @@ def _copy_metadata(source: pathlib.Path, copy_source: pathlib.Path, destination:
         raise ValueError("Image and body dimensions must be positive and offsets non-negative")
 
     tags = _read(source, exiftool)
-    structures, warnings = _regions(tags, width, height, body_width, body_height, offset_x, offset_y)
+    if remove_person_info:
+        structures, warnings = {}, []
+    else:
+        structures, warnings = _regions(tags, width, height, body_width, body_height, offset_x, offset_y)
     spatial = [key for key in tags if "Region" in key or key.endswith(":SubjectArea")]
+    person_info = [key for key in tags if key.startswith("XMP-iptcExt:PersonInImage")]
     supported = set(structures)
-    for key in spatial:
-        if key not in supported and key not in ("XMP-mwg-rs:RegionInfo", "XMP-MP:RegionInfoMP"):
-            warnings.append(f"Unsupported spatial metadata omitted: {key}")
+    if not remove_person_info:
+        for key in spatial:
+            if key not in supported and key not in ("XMP-mwg-rs:RegionInfo", "XMP-MP:RegionInfoMP"):
+                warnings.append(f"Unsupported spatial metadata omitted: {key}")
 
     excludes = list(_COPY_EXCLUDES)
+    if remove_person_info:
+        excludes.extend(f"--{key}" for key in person_info)
+        excludes.extend(f"--{key}" for key in spatial)
     for key in spatial:
         if key not in supported:
             excludes.append(f"--{key}")
@@ -275,6 +336,8 @@ def _copy_metadata(source: pathlib.Path, copy_source: pathlib.Path, destination:
     _run(exiftool, "-tagsFromFile", str(copy_source), *copy_groups, *excludes, *charset_args,
          "-overwrite_original", str(destination), cwd=copy_cwd)
     cleanup = [f"-{key}=" for key in spatial if key not in supported]
+    if remove_person_info:
+        cleanup.extend(f"-{key}=" for key in person_info)
     cleanup.extend(("-XMP-xmp:Thumbnails=", "-XMP-xmp:ThumbnailImage="))
     if cleanup:
         _run(exiftool, *cleanup, "-overwrite_original", str(destination))
@@ -294,17 +357,18 @@ def _copy_metadata(source: pathlib.Path, copy_source: pathlib.Path, destination:
 
 def copy_metadata(source: pathlib.Path, destination: pathlib.Path, *, exiftool: pathlib.Path,
                   format: str, width: int, height: int, body_width: int, body_height: int,
-                  offset_x: int, offset_y: int) -> list[str]:
+                  offset_x: int, offset_y: int, remove_person_info: bool = False) -> list[str]:
     source, destination, exiftool = (pathlib.Path(source).resolve(), pathlib.Path(destination).resolve(),
                                      pathlib.Path(exiftool).resolve())
     if "%" not in str(source):
         return _copy_metadata(source, source, destination, exiftool=exiftool, format=format, width=width,
                               height=height, body_width=body_width, body_height=body_height,
-                              offset_x=offset_x, offset_y=offset_y)
+                              offset_x=offset_x, offset_y=offset_y, remove_person_info=remove_person_info)
     with tempfile.TemporaryDirectory(prefix="exiftool-source-") as temp_dir:
         copy_source = pathlib.Path("metadata.tif")
         staged_source = pathlib.Path(temp_dir) / copy_source
         shutil.copyfile(source, staged_source)
         return _copy_metadata(source, copy_source, destination, exiftool=exiftool, format=format, width=width,
                               height=height, body_width=body_width, body_height=body_height,
-                              offset_x=offset_x, offset_y=offset_y, copy_cwd=pathlib.Path(temp_dir))
+                              offset_x=offset_x, offset_y=offset_y, copy_cwd=pathlib.Path(temp_dir),
+                              remove_person_info=remove_person_info)

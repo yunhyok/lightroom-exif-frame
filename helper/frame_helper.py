@@ -19,6 +19,9 @@ FIELDS = {"make", "model", "lens", "iso", "aperture", "shutter", "focal", "focal
 
 
 def run(executable: Path, arguments: list[str], *, binary: bool = False) -> str | bytes:
+    if executable.stem.lower().startswith("exiftool"):
+        result = metadata.run_exiftool(executable, *map(str, arguments), binary=binary)
+        return result.stdout if binary else result.stdout.strip()
     if executable.stem.lower() == "magick" and arguments != ["-version"]:
         limits = ["-limit", "memory", "512MiB", "-limit", "map", "1GiB", "-limit", "disk", "2GiB", "-limit", "time", "120"]
         arguments = ([arguments[0], *limits, *arguments[1:]] if arguments and arguments[0] == "identify"
@@ -78,7 +81,7 @@ def validate(job: dict) -> dict:
         result[name] = job.get(name, default)
         if result[name] not in choices:
             raise ValueError(f"Invalid {name}")
-    for name in ("preview", "lossless"):
+    for name in ("preview", "lossless", "remove_person_info"):
         result[name] = job.get(name, False)
         if not isinstance(result[name], bool):
             raise ValueError(f"{name} must be boolean")
@@ -364,7 +367,8 @@ def render(raw_job: dict) -> dict:
             raise ValueError("Renderer lost or changed destination ICC profile")
         if not job["preview"]:
             warnings.extend(metadata.copy_metadata(job["input_path"], stage, exiftool=exiftool, format=fmt,
-                            width=final_width, height=final_height, body_width=body_width, body_height=body_height, offset_x=offset_x, offset_y=offset_y))
+                            width=final_width, height=final_height, body_width=body_width, body_height=body_height,
+                            offset_x=offset_x, offset_y=offset_y, remove_person_info=job["remove_person_info"]))
         output = publish(stage, job["output_path"])
     return {"schema_version": 1, "ok": True, "output_path": str(output), "width": final_width, "height": final_height, "warnings": warnings}
 

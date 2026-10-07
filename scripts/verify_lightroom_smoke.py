@@ -6,6 +6,7 @@ https://ioconsolerykerprodcdn.azureedge.net/static/installers/lr/sdk/2022/cross_
 No Lightroom UI success flag substitutes for the file checks below.
 """
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import math
@@ -14,9 +15,12 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import uuid
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "helper"))
+from metadata import run_exiftool
 EXPECTED_IDS = {f"{n:02}" for n in range(1, 14)}
 CAMERA = {"Make", "Model", "LensModel", "LensInfo", "Lens", "LensID", "ExposureTime", "FNumber", "ISO",
           "ShutterSpeedValue", "ApertureValue", "ExposureProgram", "ExposureCompensation", "MeteringMode",
@@ -29,11 +33,14 @@ GROUPS = {
     "caption": lambda key: key.split(":")[-1] in {"ImageDescription", "Description", "Caption-Abstract", "UserComment"},
     "title": lambda key: key.split(":")[-1] in {"Title", "ObjectName"},
     "keywords": lambda key: key.split(":")[-1] in {"Subject", "Keywords", "HierarchicalSubject"},
-    "person": lambda key: key.split(":")[-1] in {"PersonInImage", "PersonShown"},
+    "person": lambda key: key.split(":")[-1] in {"PersonInImage", "PersonShown", "PersonInImageWDetails"},
 }
 
 
 def run(executable, args, binary=False):
+    if executable.stem.lower().startswith("exiftool"):
+        result = run_exiftool(executable, *map(str, args), binary=binary)
+        return result.stdout
     if executable.name.lower() == "magick.exe":
         limits = ["-limit", "memory", "512MiB", "-limit", "map", "1GiB", "-limit", "disk", "2GiB", "-limit", "time", "120"]
         args = [args[0], *limits, *args[1:]] if args and args[0] == "identify" else [*limits, *args]
@@ -128,7 +135,13 @@ def verify(evidence_path, magick, exiftool):
         if not condition:
             summary["failures"].append(message)
 
-    global_check(evidence.get("schema_version") == 1 and evidence.get("kind") == "manual-actual-lightroom-sdk", "Unexpected harness evidence schema")
+    global_check(evidence.get("schema_version") == 1 and evidence.get("kind") in {"manual-actual-lightroom-sdk", "actual-lightroom-tiff-replay"}, "Unexpected harness evidence schema")
+    summary["evidence_kind"] = evidence.get("kind")
+    if evidence.get("kind") == "actual-lightroom-tiff-replay":
+        summary["original_evidence_path"] = evidence.get("original_evidence_path")
+        summary["helper_sha256"] = evidence.get("helper_sha256")
+        summary["replay_completed_utc"] = evidence.get("replay_completed_utc")
+        summary["limitations"].append("Replayed preserved actual Lightroom TIFFs with a rebuilt helper; this is not a second live Lightroom export.")
     global_check(bool(evidence.get("completed_utc")), "Harness did not finish")
     global_check(not evidence.get("cancelled") and not evidence.get("harness_error"), "Harness cancelled or raised an error")
     global_check(evidence.get("fixture_setup", {}).get("ok") is True, "Catalog metadata fixture setup failed")
@@ -213,7 +226,10 @@ def verify(evidence_path, magick, exiftool):
                 # WebP may transport IPTC via XMP; verify values across namespaces rather than falsely requiring an IPTC container.
                 missing = unmatched(values(source_group), values(final_group), numeric=name in {"camera", "gps"})
                 extra = unmatched(values(final_group), values(source_group), numeric=name in {"camera", "gps"})
-                check(not missing, name + " metadata values preserved", missing)
+                if name == "person" and row.get("remove_person"):
+                    check(not final_group, "requested person-info output suppression")
+                else:
+                    check(not missing, name + " metadata values preserved", missing)
                 check(not extra, name + " metadata has no source-external values", extra)
             for key, value in final_tags.items():
                 leaf = key.split(":")[-1]
@@ -241,8 +257,14 @@ def verify(evidence_path, magick, exiftool):
                 check(any(isinstance(value, (int, float)) and abs(value - .125) < .00001 for value in latitudes)
                       and any(isinstance(value, (int, float)) and abs(value - .25) < .00001 for value in longitudes), "synthetic GPS retained by all mode")
             if row.get("remove_person"):
-                person_values = values(category(source_tags, "person")) | values(category(source_tags, "keywords"))
-                check(not category(source_tags, "person") and not any("SDK Synthetic Person" in value for value in person_values), "remove-person mode has no seeded person data or keyword")
+                check(settings.get("LR_removeFaceMetadata") is True, "person suppression matches recorded native Lightroom request")
+                person_tags = category(source_tags, "person")
+                if person_tags:
+                    item["upstream_privacy_observation"] = "Lightroom retained person data in its filtered TIFF despite the recorded removal request; final output is checked separately for explicit suppression."
+                    summary["limitations"].append("Case13: Lightroom retained seeded PersonInImage in filtered TIFF despite LR_removeFaceMetadata=true. Explicit helper suppression is required and independently checked.")
+                spatial = {key: value for key, value in final_tags.items()
+                           if key in {"XMP-mwg-rs:RegionInfo", "XMP-MP:RegionInfoMP"}}
+                check(not category(final_tags, "person") and not spatial, "remove-person output has no person or MWG/Microsoft region fields")
             elif mode == "all" and person_seeded:
                 check(any("SDK Synthetic Person" in value for value in values(category(source_tags, "person")) | values(category(source_tags, "keywords"))), "synthetic person data retained by all mode")
             if mode in {"all", "copyrightAndContactOnly", "allExceptCameraInfo"}:
@@ -286,14 +308,53 @@ def verify(evidence_path, magick, exiftool):
     return summary
 
 
+def replay_evidence(evidence_path):
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8-sig"))
+    if evidence.get("kind") != "manual-actual-lightroom-sdk" or not evidence.get("completed_utc"):
+        raise ValueError("Replay requires a completed original actual Lightroom harness run")
+    helper = ROOT / "LightroomExifFrame.lrplugin/bin/frame-helper.exe"
+    token = uuid.uuid4().hex[:12]
+    environment = {key: value for key, value in os.environ.items() if not key.upper().startswith("EXIF_FRAME_")}
+    for row in evidence["results"]:
+        tiff = checked_path(row["filtered_tiff"], evidence_path.parent)
+        folder = tiff.parent.parent
+        job = json.loads((folder / "job.json").read_text(encoding="utf-8-sig"))
+        if Path(job["input_path"]).resolve() != tiff or Path(job["output_path"]).resolve().parent != folder:
+            raise ValueError("Original job does not match the preserved TIFF and case directory")
+        job_path = folder / ("job-replay-" + token + ".json")
+        job["result_path"] = str(folder / ("result-replay-" + token + ".json"))
+        # Preserve the native Lightroom request from the original run; never infer privacy from keywords or captions.
+        job["remove_person_info"] = row.get("export_settings", {}).get("LR_removeFaceMetadata") is True
+        job_path.write_text(json.dumps(job, ensure_ascii=False), encoding="utf-8")
+        completed = subprocess.run([str(helper), "--job", str(job_path)], env=environment, shell=False,
+                                   capture_output=True, timeout=180, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        result = json.loads(Path(job["result_path"]).read_text(encoding="utf-8"))
+        row["helper"] = result
+        row["replay_job_path"] = str(job_path)
+        row["ok"] = completed.returncode == 0 and result.get("ok") is True
+        if not row["ok"]:
+            row["error"] = result.get("error") or completed.stderr.decode("utf-8", "replace")
+        print(json.dumps({"replayed": row["id"], "ok": row["ok"]}, ensure_ascii=False), flush=True)
+    evidence["kind"] = "actual-lightroom-tiff-replay"
+    evidence["original_evidence_path"] = public_path(evidence_path)
+    evidence["helper_sha256"] = hashlib.sha256(helper.read_bytes()).hexdigest()
+    evidence["replay_completed_utc"] = datetime.now(timezone.utc).isoformat()
+    destination = evidence_path.with_name("evidence-replay-" + token + ".json")
+    destination.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return destination
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("evidence", nargs="?", type=Path, help="evidence.json; defaults to newest workspace harness run")
     parser.add_argument("--output", type=Path, default=ROOT / "work/live-validation.json")
+    parser.add_argument("--replay", action="store_true", help="Replay preserved TIFF jobs with the current frozen helper into new numbered outputs and separate evidence")
     args = parser.parse_args()
     try:
         candidates = list((ROOT / "work/lr-sdk-output").glob("*/evidence.json"))
         evidence = args.evidence.resolve(strict=True) if args.evidence else max(candidates, key=lambda path: path.stat().st_mtime).resolve()
+        if args.replay:
+            evidence = replay_evidence(evidence)
         magick, exiftool = ROOT / "vendor/imagemagick/magick.exe", ROOT / "vendor/exiftool/exiftool.exe"
         summary = verify(evidence, magick, exiftool)
     except Exception as error:

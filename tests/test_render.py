@@ -67,6 +67,24 @@ class RenderTests(unittest.TestCase):
         tags = json.loads(renderer.run(self.exiftool, ["-j", "-Artist", str(image)]))[0]
         self.assertEqual(tags["Artist"], "Filtered Copyright")
 
+    def test_person_privacy_flag_preserves_normal_keywords_and_pixels(self):
+        renderer.run(self.exiftool, ["-overwrite_original", "-XMP-iptcExt:PersonInImage=SDK Synthetic Person",
+                                    "-XMP-dc:Subject=SDK Synthetic Person", str(self.input)])
+        self.job["remove_person_info"] = "true"
+        with self.assertRaisesRegex(ValueError, "remove_person_info must be boolean"):
+            renderer.render(self.job)
+        self.job.pop("remove_person_info")
+        regular = renderer.render(self.job)
+        tags = json.loads(renderer.run(self.exiftool, ["-j", "-PersonInImage", str(regular["output_path"])]))[0]
+        self.assertEqual(tags["PersonInImage"], "SDK Synthetic Person")
+        self.job["remove_person_info"] = True
+        private = renderer.render(self.job)
+        tags = json.loads(renderer.run(self.exiftool, ["-j", "-PersonInImage", "-Subject", "-Artist", str(private["output_path"])]))[0]
+        self.assertNotIn("PersonInImage", tags)
+        self.assertEqual(tags["Subject"], "SDK Synthetic Person")
+        self.assertEqual(tags["Artist"], "Filtered Copyright")
+        self.assertEqual(self.raw(private["output_path"], "384x256+0+0"), self.pixels)
+
     def test_none_and_numbered_output_are_atomic_no_overwrite(self):
         self.job["theme"] = "none"
         first = Path(renderer.render(self.job)["output_path"])

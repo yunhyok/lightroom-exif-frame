@@ -171,6 +171,7 @@ function Frame.run(p, photo, input, dir, preview)
     if p.ef_appearance == 'custom' then colors = {p.ef_background,p.ef_text,p.ef_secondary} end
     local job = { schema_version = 1, input_path = input, output_path = output,
         result_path = resultPath, source_path = tostring(read(photo, 'getRawMetadata', 'path')),
+        remove_person_info = p.LR_removeFaceMetadata == true,
         preview = preview or false, preview_max_size = 600, format = p.ef_format,
         quality = tonumber(p.ef_quality), lossless = p.ef_lossless == true,
         bit_depth = p.ef_format == 'png' and p.ef_pngDepth or 8,

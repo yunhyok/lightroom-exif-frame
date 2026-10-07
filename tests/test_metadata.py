@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 import unittest
 
-from helper.metadata import copy_metadata, read_display_metadata
+from helper.metadata import copy_metadata, read_display_metadata, run_exiftool
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -46,12 +46,10 @@ class MetadataTests(unittest.TestCase):
     def _write(self, image: pathlib.Path, tags: dict[str, object]) -> None:
         payload = self.directory / "tags.json"
         payload.write_text(json.dumps([{"SourceFile": str(image), **tags},], ensure_ascii=False), encoding="utf-8")
-        subprocess.run([str(EXIFTOOL), "-config", "", "-struct", f"-j={payload}", "-overwrite_original",
-                        str(image)], check=True, capture_output=True)
+        run_exiftool(EXIFTOOL, "-struct", f"-j={payload}", "-overwrite_original", str(image))
 
     def _read(self, image: pathlib.Path) -> dict[str, object]:
-        result = subprocess.run([str(EXIFTOOL), "-config", "", "-j", "-G1", "-a", "-s", "-struct", "-n",
-                                 str(image)], check=True, capture_output=True, text=True, encoding="utf-8")
+        result = run_exiftool(EXIFTOOL, "-j", "-G1", "-a", "-s", "-struct", "-n", str(image))
         return json.loads(result.stdout)[0]
 
     def test_display_metadata_returns_only_visible_frame_fields(self) -> None:
@@ -89,12 +87,10 @@ class MetadataTests(unittest.TestCase):
         if profile.is_file():
             create += ["-profile", str(profile)]
         subprocess.run([*create, str(output)], check=True, capture_output=True)
-        icc_before = subprocess.run([str(EXIFTOOL), "-config", "", "-b", "-ICC_Profile", str(output)],
-                                    check=True, capture_output=True).stdout
+        icc_before = run_exiftool(EXIFTOOL, "-b", "-ICC_Profile", str(output), binary=True).stdout
         warnings = copy_metadata(self.source, output, exiftool=EXIFTOOL, format="jpg", width=120, height=100,
                                  body_width=100, body_height=80, offset_x=10, offset_y=10)
-        icc_after = subprocess.run([str(EXIFTOOL), "-config", "", "-b", "-ICC_Profile", str(output)],
-                                   check=True, capture_output=True).stdout
+        icc_after = run_exiftool(EXIFTOOL, "-b", "-ICC_Profile", str(output), binary=True).stdout
         tags = self._read(output)
         self.assertFalse(warnings)
         self.assertEqual(hashlib.sha256(icc_before).digest(), hashlib.sha256(icc_after).digest())
@@ -145,6 +141,38 @@ class MetadataTests(unittest.TestCase):
         self.assertFalse(any("GPS" in key or "RegionInfo" in key for key in tags))
         self.assertIn("Retained", str(tags.values()))
 
+    def test_remove_person_info_filters_typed_person_and_regions_only(self) -> None:
+        self._write(self.source, {
+            "EXIF:Artist": "Photographer",
+            "XMP-dc:Description": "Caption stays",
+            "XMP-dc:Rights": "Copyright stays",
+            "XMP-dc:Subject": ["wildlife", "shorebird"],
+            "XMP-iptcExt:PersonInImage": ["Ada Lovelace"],
+            "XMP-iptcExt:PersonInImageWDetails": [{"PersonId": ["person-1"]}],
+            "XMP-mwg-rs:RegionInfo": {
+                "AppliedToDimensions": {"W": 100, "H": 80, "Unit": "pixel"},
+                "RegionList": [{"Area": {"X": 0.5, "Y": 0.5, "W": 0.2, "H": 0.2,
+                                         "Unit": "normalized"}, "Name": "Ada", "Type": "Face"}],
+            },
+            "XMP-MP:RegionInfoMP": {"Regions": [{"PersonDisplayName": "Ada", "Rectangle": "0.2,0.2,0.3,0.3"}]},
+        })
+        for extension in ("jpg", "png", "webp"):
+            with self.subTest(extension=extension):
+                output = self.directory / f"no-person-info.{extension}"
+                subprocess.run([str(MAGICK), "-size", "120x100", "xc:white", str(output)], check=True,
+                               capture_output=True)
+                warnings = copy_metadata(self.source, output, exiftool=EXIFTOOL, format=extension,
+                                         width=120, height=100, body_width=100, body_height=80,
+                                         offset_x=10, offset_y=10, remove_person_info=True)
+                tags = self._read(output)
+                self.assertEqual(warnings, [])
+                self.assertFalse(any(key.startswith("XMP-iptcExt:PersonInImage") for key in tags))
+                self.assertFalse(any("RegionInfo" in key or key.endswith(":ImageRegion") for key in tags))
+                self.assertEqual(tags.get("XMP-dc:Description"), "Caption stays")
+                self.assertEqual(tags.get("XMP-dc:Rights"), "Copyright stays")
+                self.assertEqual(tags.get("XMP-dc:Subject"), ["wildlife", "shorebird"])
+                self.assertEqual(tags.get("IFD0:Artist"), "Photographer")
+
     def test_copy_uses_only_filtered_tiff_for_jpg_png_and_webp(self) -> None:
         self._write(self.source, {"XMP-dc:Description": "Filtered TIFF only"})
         for extension in ("jpg", "png", "webp"):
@@ -168,8 +196,7 @@ class MetadataTests(unittest.TestCase):
                                        "Unit": "pixel"}, "Name": "Person", "Type": "Face"}],
             },
         })
-        subprocess.run([str(EXIFTOOL), "-config", "", "-XMP-tiff:Orientation#=6", "-overwrite_original",
-                        str(self.source)], check=True, capture_output=True)
+        run_exiftool(EXIFTOOL, "-XMP-tiff:Orientation#=6", "-overwrite_original", str(self.source))
         output = self.directory / "xmp-clean.png"
         subprocess.run([str(MAGICK), "-size", "120x100", "xc:white", str(output)], check=True, capture_output=True)
         warnings = copy_metadata(self.source, output, exiftool=EXIFTOOL, format="png", width=120, height=100,
@@ -229,7 +256,10 @@ class MetadataTests(unittest.TestCase):
 
     def test_webp_converts_iim_title_when_xmp_title_missing(self) -> None:
         self._write(self.source, {"IPTC:CodedCharacterSet": "UTF8", "IPTC:ObjectName": "IIM title",
-                                  "IPTC:Keywords": ["하늘", "바다"], "IPTC:Contact": "photo@example.test"})
+                                  "IPTC:Keywords": ["하늘", "바다"], "IPTC:Contact": "photo@example.test",
+                                  "IPTC:DateCreated": "2024:04:08", "IPTC:TimeCreated": "12:31:11",
+                                  "IPTC:DigitalCreationDate": "2024:04:09",
+                                  "IPTC:DigitalCreationTime": "13:45:00"})
         output = self.directory / "frame.webp"
         subprocess.run([str(MAGICK), "-size", "120x100", "xc:white", str(output)], check=True, capture_output=True)
         warnings = copy_metadata(self.source, output, exiftool=EXIFTOOL, format="webp", width=120, height=100,
@@ -238,6 +268,10 @@ class MetadataTests(unittest.TestCase):
         self.assertEqual(warnings, ["WebP IPTC field not mapped to XMP: IPTC:Contact"])
         self.assertIn("IIM title", str(tags.get("XMP-dc:Title")))
         self.assertIn("하늘", str(tags.values()))
+        self.assertIn("2024:04:08", str(tags.get("XMP-photoshop:DateCreated")))
+        self.assertIn("12:31:11", str(tags.get("XMP-photoshop:DateCreated")))
+        self.assertIn("2024:04:09", str(tags.get("XMP-xmp:CreateDate")))
+        self.assertIn("13:45:00", str(tags.get("XMP-xmp:CreateDate")))
 
     def test_webp_keeps_native_xmp_over_iim_fallback(self) -> None:
         self._write(self.source, {"IPTC:ObjectName": "IIM title", "XMP-dc:Title-en-US": "Native XMP title"})

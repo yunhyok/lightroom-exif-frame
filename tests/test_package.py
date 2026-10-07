@@ -5,10 +5,13 @@ from pathlib import Path
 import shutil
 import struct
 import subprocess
+import sys
 import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "helper"))
+import metadata
 
 
 class PackageSmokeTests(unittest.TestCase):
@@ -47,6 +50,9 @@ class PackageSmokeTests(unittest.TestCase):
 
     @staticmethod
     def validator(executable, arguments, *, binary=False):
+        if executable.stem.lower().startswith("exiftool"):
+            result = metadata.run_exiftool(executable, *arguments, binary=binary)
+            return result.stdout
         result = subprocess.run([str(executable), *arguments], shell=False, capture_output=True, timeout=180,
                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         if result.returncode:
