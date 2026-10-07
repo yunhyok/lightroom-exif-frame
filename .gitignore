@@ -1,0 +1,13 @@
+.venv/
+vendor/
+build/
+dist/
+work/
+__pycache__/
+*.pyc
+*.spec
+*.log
+.pytest_cache/
+LightroomExifFrame.lrplugin/bin/
+LightroomExifFrame.lrplugin/LICENSE.txt
+LightroomExifFrame.lrplugin/THIRD_PARTY_NOTICES.md

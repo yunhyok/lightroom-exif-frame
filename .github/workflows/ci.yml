@@ -1,0 +1,31 @@
+name: Windows checks and package
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python scripts/fetch_vendor.py
+      - name: Real encoder and Lua checks
+        shell: pwsh
+        run: |
+          $env:EXIF_FRAME_MAGICK = Join-Path $PWD 'vendor/imagemagick/magick.exe'
+          $env:EXIF_FRAME_EXIFTOOL = Join-Path $PWD 'vendor/exiftool/exiftool.exe'
+          $env:EXIF_FRAME_TEST_FONT = 'C:/Windows/Fonts/segoeui.ttf'
+          python -m unittest discover -s tests -v
+      - run: python scripts/build.py
+      - name: Frozen package without development tools on PATH
+        shell: pwsh
+        run: |
+          $env:EXIF_FRAME_TEST_FONT = 'C:/Windows/Fonts/segoeui.ttf'
+          python -m unittest discover -s tests -p test_package.py -v
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lightroom-EXIF-Frame-Windows
+          path: dist/*
