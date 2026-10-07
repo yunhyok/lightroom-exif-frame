@@ -129,9 +129,13 @@ def verify(evidence_path, magick, exiftool):
     evidence = json.loads(evidence_path.read_text(encoding="utf-8-sig"))
     directory = evidence_path.parent.resolve()
     summary = {"schema_version": 1, "kind": "independent-actual-lightroom-file-verification",
-               "evidence_path": public_path(evidence_path), "ok": False, "cases": [], "failures": [], "limitations": []}
+               "evidence_path": public_path(evidence_path), "ok": False, "cases": [], "failures": [], "limitations": [],
+               "global_comparison_count": 0, "global_passed_comparison_count": 0}
 
     def global_check(condition, message):
+        summary["global_comparison_count"] += 1
+        if condition:
+            summary["global_passed_comparison_count"] += 1
         if not condition:
             summary["failures"].append(message)
 
@@ -161,6 +165,7 @@ def verify(evidence_path, magick, exiftool):
     summary["limitations"].append("File verification covers rendered TIFFs and outputs; it does not verify Lightroom UI controls or a pristine Windows installation.")
     for row in rows:
         item = {"id": row.get("id"), "format": row.get("format"), "metadata_mode": row.get("metadata_mode"),
+                "requested_profile": row.get("profile"),
                 "checks": [], "failures": [], "metadata": {}}
         summary["cases"].append(item)
 
@@ -287,6 +292,18 @@ def verify(evidence_path, magick, exiftool):
     crop = virtual.get("applied_crop", {})
     develop = virtual.get("develop_settings", {})
     summary["virtual_copy"] = {"applied_crop": crop, "develop_orientation": develop.get("orientation")}
+    applied_develop = virtual.get("applied_develop")
+    summary["virtual_copy"]["develop_adjustments"] = {
+        key: {"requested": applied_develop.get(key) if isinstance(applied_develop, dict) else None,
+              "observed": develop.get(key)} for key in ("Exposure2012", "Contrast2012")}
+    if isinstance(applied_develop, dict):
+        for key in ("Exposure2012", "Contrast2012"):
+            requested, observed = applied_develop.get(key), develop.get(key)
+            global_check(isinstance(requested, (int, float)) and requested != 0
+                         and isinstance(observed, (int, float)) and math.isclose(requested, observed, abs_tol=1e-9),
+                         "Virtual-copy " + key + " nonzero request/readback mismatch")
+    else:
+        summary["limitations"].append("This baseline harness run applied crop/rotation but no explicit exposure/contrast adjustment.")
     global_check(all(isinstance(crop.get(key), (int, float)) for key in ("CropLeft", "CropRight", "CropTop", "CropBottom"))
                  and 0 < crop.get("CropRight", 0) - crop.get("CropLeft", 0) < 1
                  and 0 < crop.get("CropBottom", 0) - crop.get("CropTop", 0) < 1, "Virtual copy has no actual nontrivial applied crop")
@@ -301,11 +318,54 @@ def verify(evidence_path, magick, exiftool):
                      "Actual virtual TIFF dimensions do not demonstrate quarter-turn rotation")
     else:
         global_check(False, "Missing actual master/virtual TIFF geometry")
+    baseline_path = ROOT / "work/live-validation-before-develop.json"
+    if isinstance(applied_develop, dict) and baseline_path.is_file():
+        baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+        def body_hash(report, prefix):
+            return next((case.get("body_pixels_sha256") for case in report.get("cases", [])
+                         if str(case.get("id", "")).startswith(prefix)), None)
+        baseline_master, current_master = body_hash(baseline, "06-"), body_hash(summary, "06-")
+        baseline_virtual, current_virtual = body_hash(baseline, "12-"), body_hash(summary, "12-")
+        global_check(bool(baseline_master) and current_master == baseline_master,
+                     "Master TIFF pixels changed between baseline and develop runs")
+        changed = bool(baseline_virtual) and bool(current_virtual) and current_virtual != baseline_virtual
+        global_check(changed, "Nonzero develop adjustments did not change rendered virtual TIFF pixels")
+        summary["virtual_copy"]["rendered_change_verified"] = changed
+        summary["virtual_copy"]["baseline_evidence_path"] = baseline.get("evidence_path")
     summary["numeric_metadata_tolerance"] = {"relative": 1e-6, "absolute": 1e-12, "groups": ["camera", "gps"]}
+    summary["comparison_count"] = summary["global_comparison_count"] + sum(len(case["checks"]) + len(case["failures"]) for case in summary["cases"])
+    summary["passed_comparison_count"] = summary["global_passed_comparison_count"] + sum(len(case["checks"]) for case in summary["cases"])
+    summary["pixel_comparison_count"] = sum("pixels exactly equal" in name for case in summary["cases"] for name in case["checks"])
     summary["case_count"] = len(summary["cases"])
     summary["passed_count"] = sum(case["ok"] for case in summary["cases"])
     summary["ok"] = not summary["failures"] and summary["passed_count"] == 13
     return summary
+
+
+def public_summary(summary):
+    """Publish counts/hashes/relative references without photograph metadata values."""
+    result = {key: summary.get(key) for key in ("schema_version", "kind", "evidence_kind", "evidence_path", "ok",
+               "case_count", "passed_count", "comparison_count", "passed_comparison_count", "pixel_comparison_count",
+               "global_comparison_count", "global_passed_comparison_count",
+               "numeric_metadata_tolerance", "helper_sha256", "limitations")}
+    result["synthetic_seed_supported"] = {key: row.get("ok") is True for key, row in summary.get("synthetic_seed", {}).items()}
+    result["failures"] = [message.split(": ", 1)[0] for message in summary.get("failures", [])]
+    result["cases"] = []
+    for case in summary["cases"]:
+        item = {key: case.get(key) for key in ("id", "format", "metadata_mode", "requested_profile", "ok", "body_offset",
+                "icc_sha256", "body_pixels_sha256", "upstream_privacy_observation")}
+        item["comparison_count"] = len(case["checks"]) + len(case["failures"])
+        item["passed_comparison_count"] = len(case["checks"])
+        item["failures"] = [message.split(": ", 1)[0] for message in case["failures"]]
+        item["metadata"] = case["metadata"]
+        for name in ("tiff", "output"):
+            item[name] = {key: value for key, value in case.get(name, {}).items() if key not in {"icc_description", "path"}}
+        result["cases"].append(item)
+    virtual = summary.get("virtual_copy", {})
+    result["virtual_copy"] = {key: virtual.get(key) for key in ("master_tiff_size", "virtual_tiff_size", "develop_adjustments",
+                              "rendered_change_verified", "baseline_evidence_path")}
+    result["virtual_copy"]["nontrivial_crop_applied"] = bool(virtual.get("applied_crop"))
+    return result
 
 
 def replay_evidence(evidence_path):
@@ -348,6 +408,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("evidence", nargs="?", type=Path, help="evidence.json; defaults to newest workspace harness run")
     parser.add_argument("--output", type=Path, default=ROOT / "work/live-validation.json")
+    parser.add_argument("--public-output", type=Path, help="Optional sanitized public summary with counts, hashes and relative evidence paths")
     parser.add_argument("--replay", action="store_true", help="Replay preserved TIFF jobs with the current frozen helper into new numbered outputs and separate evidence")
     args = parser.parse_args()
     try:
@@ -357,14 +418,22 @@ def main():
             evidence = replay_evidence(evidence)
         magick, exiftool = ROOT / "vendor/imagemagick/magick.exe", ROOT / "vendor/exiftool/exiftool.exe"
         summary = verify(evidence, magick, exiftool)
+        if summary.get("evidence_kind") == "manual-actual-lightroom-sdk":
+            actual_helper = ROOT / "work/LightroomSmoke.lrplugin/bin/frame-helper.exe"
+            if actual_helper.is_file():
+                summary["helper_sha256"] = hashlib.sha256(actual_helper.read_bytes()).hexdigest()
     except Exception as error:
         summary = {"schema_version": 1, "kind": "independent-actual-lightroom-file-verification", "ok": False,
                    "failures": [str(error)], "cases": [], "case_count": 0, "passed_count": 0}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     summary = sanitize(summary)
     args.output.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.public_output:
+        args.public_output.parent.mkdir(parents=True, exist_ok=True)
+        args.public_output.write_text(json.dumps(public_summary(summary), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"ok": summary["ok"], "cases": summary["case_count"], "passed": summary["passed_count"],
                       "output": public_path(args.output), "failures": summary["failures"],
+                      "comparisons": summary.get("comparison_count", 0), "passed_comparisons": summary.get("passed_comparison_count", 0),
                       "failed_cases": [{"id": case["id"], "failures": case["failures"]} for case in summary["cases"] if not case["ok"]]}, ensure_ascii=False))
     return 0 if summary["ok"] else 1
 

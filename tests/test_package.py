@@ -68,6 +68,15 @@ class PackageSmokeTests(unittest.TestCase):
         self.assertTrue(Path(job["result_path"]).is_file(), completed.stderr.decode("utf-8", "replace"))
         return completed.returncode, json.loads(Path(job["result_path"]).read_text(encoding="utf-8"))
 
+    def test_bundled_exiftool_works_from_unicode_bundle_and_input_paths(self):
+        bundled_exiftool = self.bundle / "exiftool" / "ExifTool.exe"
+        runtime_dir = bundled_exiftool.parent / "exiftool_files"
+        before = set(runtime_dir.iterdir())
+        result = metadata.run_exiftool(bundled_exiftool, "-j", "-Artist", str(self.input))
+        self.assertEqual(set(runtime_dir.iterdir()), before, "ExifTool invocation must not write beside the installed runtime")
+        tags = json.loads(result.stdout)[0]
+        self.assertEqual(tags.get("Artist"), "Filtered Package Copyright")
+
     def test_frozen_outputs_and_failure_with_no_development_runtime_paths(self):
         self.assertFalse(any(key.upper().startswith("EXIF_FRAME_") for key in self.environment))
         self.assertNotIn("PYTHONHOME", self.environment)

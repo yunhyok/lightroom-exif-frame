@@ -206,12 +206,18 @@ LrFunctionContext.postAsyncTaskWithContext('EXIF Frame actual SDK smoke', functi
                 for key, value in pairs({CropLeft=.12,CropRight=.88,CropTop=.12,CropBottom=.88,HasCrop=true}) do
                     if settings[key] ~= nil then crop[key]=value end
                 end
+                local develop = copySettings(crop)
+                for key, value in pairs({Exposure2012=.35, Contrast2012=12}) do
+                    assert(settings[key] ~= nil, 'Develop control unavailable: ' .. key)
+                    develop[key]=value
+                end
                 catalog:withWriteAccessDo('EXIF Frame test virtual-copy develop', function()
                     assert(copy:getRawMetadata('isVirtualCopy'), 'Virtual-copy safety guard')
-                    if next(crop) then copy:applyDevelopSettings(crop, 'EXIF Frame SDK crop') end
+                    copy:applyDevelopSettings(develop, 'EXIF Frame SDK develop and crop')
                     copy:rotateRight()
                 end, {timeout=10})
                 evidence.virtual_copy={local_identifier=copy.localIdentifier, applied_crop=crop,
+                    applied_develop=develop,
                     develop_settings=copy:getDevelopSettings()}
                 renderCase({id='12-virtual-crop-rotate-png16', mode='all', format='png', profile='sRGB', theme='simple'}, copy)
             end)

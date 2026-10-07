@@ -6,6 +6,7 @@ import subprocess
 import sys
 import zipfile
 import importlib.metadata
+import ssl
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "0.1.0"
@@ -32,6 +33,11 @@ def main():
     if not python_license.is_file():
         raise RuntimeError("Python runtime license not found")
     shutil.copy2(python_license, licenses / "PYTHON.txt")
+    shutil.copy2(ROOT / "docs/licenses/OPENSSL.txt", licenses / "OPENSSL.txt")
+    (licenses / "RUNTIME.txt").write_text(
+        f"CPython {sys.version}\n{ssl.OPENSSL_VERSION}\n"
+        "OpenSSL is copyright The OpenSSL Project Authors and contributors.\n"
+        "https://github.com/openssl/openssl\n", encoding="utf-8")
     distribution = importlib.metadata.distribution("pyinstaller")
     for file in distribution.files or []:
         if str(file).endswith("licenses/COPYING.txt"):

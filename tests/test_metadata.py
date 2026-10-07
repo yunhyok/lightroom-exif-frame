@@ -115,21 +115,28 @@ class MetadataTests(unittest.TestCase):
     def test_literal_percent_source_path_copies_artist_and_caption(self) -> None:
         source = self.directory / "렌더 [16bit] & %.tif"
         subprocess.run([str(MAGICK), "-size", "100x80", "xc:white", str(source)], check=True, capture_output=True)
-        self._write(source, {"EXIF:Artist": "Yunhy", "XMP-dc:Description": "Percent path caption"})
-        output = self.directory / "percent-path.jpg"
-        subprocess.run([str(MAGICK), "-size", "120x100", "xc:white", str(output)], check=True, capture_output=True)
-        percent_temp = self.directory / "temp % directory"
+        self._write(source, {"EXIF:Artist": "Yunhy", "XMP-dc:Description": "Percent path caption",
+                             "IPTC:ObjectName": "Percent stage IIM title"})
+        # This is an ExifTool filename-format token if accidentally passed as
+        # a -tagsFromFile source path, so staging must select a safe temp root.
+        percent_temp = self.directory / "temp %s directory"
         percent_temp.mkdir()
         old_tempdir = tempfile.tempdir
         tempfile.tempdir = str(percent_temp)
         try:
-            copy_metadata(source, output, exiftool=EXIFTOOL, format="jpg", width=120, height=100,
-                          body_width=100, body_height=80, offset_x=10, offset_y=10)
+            for extension in ("jpg", "webp"):
+                output = self.directory / f"percent-path.{extension}"
+                subprocess.run([str(MAGICK), "-size", "120x100", "xc:white", str(output)], check=True,
+                               capture_output=True)
+                copy_metadata(source, output, exiftool=EXIFTOOL, format=extension, width=120, height=100,
+                              body_width=100, body_height=80, offset_x=10, offset_y=10)
+                tags = self._read(output)
+                self.assertIn("Yunhy", str(tags.values()))
+                self.assertIn("Percent path caption", str(tags.values()))
+                if extension == "webp":
+                    self.assertIn("Percent stage IIM title", str(tags.values()))
         finally:
             tempfile.tempdir = old_tempdir
-        tags = self._read(output)
-        self.assertIn("Yunhy", str(tags.values()))
-        self.assertIn("Percent path caption", str(tags.values()))
 
     def test_copy_does_not_restore_gps_or_face_regions_removed_by_lightroom(self) -> None:
         self._write(self.source, {"EXIF:Make": "PENTAX", "XMP-dc:Title": "Retained"})

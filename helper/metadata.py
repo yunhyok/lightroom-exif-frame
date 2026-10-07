@@ -5,9 +5,11 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import tempfile
+import ctypes
 from fractions import Fraction
 from typing import Any
 
@@ -36,6 +38,7 @@ _IPTC_ENVELOPE_TAGS = {
     "DateSent", "Destination", "EnvelopeNumber", "EnvelopePriority", "EnvelopeRecordVersion",
     "FileFormat", "FileVersion", "ModelVersion", "RecordVersion", "ServiceIdentifier", "TimeSent",
 }
+_EXIFTOOL_FORMAT_CODE = re.compile(r"%[-+]?\d*[.:]?\d*[lu]?[dDfFeEtgso]")
 
 
 def run_exiftool(exiftool: pathlib.Path, *args: str, cwd: pathlib.Path | None = None,
@@ -62,10 +65,14 @@ def run_exiftool(exiftool: pathlib.Path, *args: str, cwd: pathlib.Path | None = 
     if skip_config_value:
         raise ValueError("ExifTool configuration must remain disabled")
 
-    executable = str(pathlib.Path(exiftool).resolve())
+    executable_path = pathlib.Path(exiftool).resolve()
+    executable = str(executable_path)
+    runtime_dir = executable_path.parent / "exiftool_files"
+    perl_executable = runtime_dir / "perl.exe"
+    perl_script = runtime_dir / "exiftool"
+    use_bundled_perl = perl_executable.is_file() and perl_script.is_file()
     env = os.environ.copy()
     env.update({"LANG": "C", "LC_ALL": "C"})
-    command_prefix = [executable, "-config", "", "-charset", "filename=UTF8", "-@"]
     kwargs: dict[str, Any] = {
         "capture_output": True,
         "text": not binary,
@@ -78,27 +85,21 @@ def run_exiftool(exiftool: pathlib.Path, *args: str, cwd: pathlib.Path | None = 
     if os.name == "nt":
         kwargs["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
 
-    def invoke(directory: pathlib.Path, args_file: pathlib.Path) -> subprocess.CompletedProcess:
-        args_file.write_text("\n".join(filtered) + "\n", encoding="utf-8", newline="\n")
-        try:
-            return subprocess.run([*command_prefix, args_file.name], cwd=directory, **kwargs)
-        except subprocess.TimeoutExpired as exc:
-            raise RuntimeError("ExifTool timed out after 180 seconds") from exc
-        finally:
-            args_file.unlink(missing_ok=True)
-
-    if cwd is not None:
-        directory = pathlib.Path(cwd).resolve()
-        with tempfile.NamedTemporaryFile(dir=directory, prefix="exiftool-", suffix=".args", delete=False) as stream:
-            args_file = pathlib.Path(stream.name)
-        # Use only its ASCII basename in the command line. All path arguments
-        # in this mode are relative to the same directory by design or absolute.
-        result = invoke(directory, args_file)
+    # Feed a UTF-8 argument list on stdin. This avoids both Windows' active
+    # code page for arguments and any temporary-file write beside a read-only
+    # installed plugin. The bundled Perl entry point is ASCII and runs from
+    # its own directory so its relative library lookup remains valid.
+    launch_dir = runtime_dir if use_bundled_perl else (pathlib.Path(cwd).resolve() if cwd else None)
+    if use_bundled_perl:
+        command = [str(perl_executable), "exiftool", "-config", "", "-charset", "filename=UTF8", "-@", "-"]
     else:
-        with tempfile.TemporaryDirectory(prefix="exiftool-args-") as temp_dir:
-            directory = pathlib.Path(temp_dir)
-            args_file = directory / "metadata.args"
-            result = invoke(directory, args_file)
+        command = [executable, "-config", "", "-charset", "filename=UTF8", "-@", "-"]
+    try:
+        arg_input = "\n".join(filtered) + "\n"
+        result = subprocess.run(command, input=arg_input if not binary else arg_input.encode("utf-8"),
+                                cwd=launch_dir, **kwargs)
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError("ExifTool timed out after 180 seconds") from exc
     if result.returncode:
         detail = (result.stderr or result.stdout).strip()
         raise RuntimeError(f"ExifTool failed ({result.returncode}): {detail or 'unknown error'}")
@@ -333,8 +334,15 @@ def _copy_metadata(source: pathlib.Path, copy_source: pathlib.Path, destination:
         key.startswith("IPTC:") for key in tags
     ) else []
 
+    copy_source = pathlib.Path(copy_source)
+    if not copy_source.is_absolute() and copy_cwd is not None:
+        copy_source = pathlib.Path(copy_cwd) / copy_source
+    # Keep a generated Windows 8.3 alias intact: Path.resolve() would turn it
+    # back into a long path that may contain ExifTool's %filename tokens.
+    if not copy_source.is_absolute():
+        copy_source = copy_source.absolute()
     _run(exiftool, "-tagsFromFile", str(copy_source), *copy_groups, *excludes, *charset_args,
-         "-overwrite_original", str(destination), cwd=copy_cwd)
+         "-overwrite_original", str(destination))
     cleanup = [f"-{key}=" for key in spatial if key not in supported]
     if remove_person_info:
         cleanup.extend(f"-{key}=" for key in person_info)
@@ -345,7 +353,7 @@ def _copy_metadata(source: pathlib.Path, copy_source: pathlib.Path, destination:
         args_file = _iptc_args_file(exiftool)
         if args_file.is_file():
             warnings.extend(_warn_unmapped_iptc(args_file, tags))
-        warning = _copy_webp_iptc(exiftool, copy_source, destination, tags, copy_cwd)
+        warning = _copy_webp_iptc(exiftool, copy_source, destination, tags)
         if warning:
             warnings.append(warning)
     dim_args = _dimension_args(tags, width, height)
@@ -364,11 +372,47 @@ def copy_metadata(source: pathlib.Path, destination: pathlib.Path, *, exiftool: 
         return _copy_metadata(source, source, destination, exiftool=exiftool, format=format, width=width,
                               height=height, body_width=body_width, body_height=body_height,
                               offset_x=offset_x, offset_y=offset_y, remove_person_info=remove_person_info)
-    with tempfile.TemporaryDirectory(prefix="exiftool-source-") as temp_dir:
-        copy_source = pathlib.Path("metadata.tif")
-        staged_source = pathlib.Path(temp_dir) / copy_source
+    def short_path(path: pathlib.Path) -> pathlib.Path | None:
+        if os.name != "nt":
+            return None
+        buffer = ctypes.create_unicode_buffer(32768)
+        length = ctypes.windll.kernel32.GetShortPathNameW(str(path), buffer, len(buffer))
+        candidate = pathlib.Path(buffer.value) if length and length < len(buffer) else None
+        return candidate if candidate and not _EXIFTOOL_FORMAT_CODE.search(str(candidate)) else None
+
+    temp_root = pathlib.Path(tempfile.gettempdir())
+    candidates = [temp_root]
+    system_root = os.environ.get("SystemRoot")
+    if system_root:
+        candidates.append(pathlib.Path(system_root) / "Temp")
+    temp_dir = None
+    for parent in candidates:
+        if not parent.is_dir():
+            continue
+        try:
+            created = pathlib.Path(tempfile.mkdtemp(prefix="exiftool-source-", dir=parent))
+        except OSError:
+            continue
+        if _EXIFTOOL_FORMAT_CODE.search(str(created)):
+            safe = short_path(created)
+            if safe is None:
+                shutil.rmtree(created, ignore_errors=True)
+                continue
+            temp_dir = created
+            temp_dir_for_exiftool = safe
+        else:
+            temp_dir = created
+            temp_dir_for_exiftool = created
+        break
+    if temp_dir is None:
+        raise RuntimeError("Could not create a temporary metadata source path without ExifTool filename-format codes")
+    try:
+        copy_source = temp_dir_for_exiftool / "metadata.tif"
+        staged_source = temp_dir / "metadata.tif"
         shutil.copyfile(source, staged_source)
         return _copy_metadata(source, copy_source, destination, exiftool=exiftool, format=format, width=width,
                               height=height, body_width=body_width, body_height=body_height,
-                              offset_x=offset_x, offset_y=offset_y, copy_cwd=pathlib.Path(temp_dir),
+                              offset_x=offset_x, offset_y=offset_y,
                               remove_person_info=remove_person_info)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
