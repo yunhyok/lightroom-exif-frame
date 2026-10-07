@@ -1,0 +1,985 @@
+{
+  "schema_version": 1,
+  "kind": "independent-actual-lightroom-file-verification",
+  "evidence_kind": "manual-actual-lightroom-sdk",
+  "evidence_path": "work/lr-sdk-output/20261007T161901Z-614065/evidence.json",
+  "ok": true,
+  "case_count": 13,
+  "passed_count": 13,
+  "comparison_count": 473,
+  "passed_comparison_count": 473,
+  "pixel_comparison_count": 5,
+  "global_comparison_count": 12,
+  "global_passed_comparison_count": 12,
+  "numeric_metadata_tolerance": {
+    "relative": 1e-06,
+    "absolute": 1e-12,
+    "groups": [
+      "camera",
+      "gps"
+    ]
+  },
+  "helper_sha256": "41ef9e96ebfc3fd38128c075c6777b778676d281a2724f21cb78f0dde07231fa",
+  "limitations": [
+    "No actual face-region coordinates were seeded; Lightroom face-region UI/removal remains unverified.",
+    "File verification covers rendered TIFFs and outputs; it does not verify Lightroom UI controls or a pristine Windows installation.",
+    "Case13: Lightroom retained seeded PersonInImage in filtered TIFF despite LR_removeFaceMetadata=true. Explicit helper suppression is required and independently checked."
+  ],
+  "synthetic_seed_supported": {
+    "creatorEmail": true,
+    "creatorPhone": true,
+    "face_region": false,
+    "gps": true,
+    "gpsAltitude": true,
+    "personShown": true
+  },
+  "failures": [],
+  "cases": [
+    {
+      "id": "01-all-jpg-srgb",
+      "format": "jpg",
+      "metadata_mode": "all",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": null,
+      "comparison_count": 36,
+      "passed_comparison_count": 36,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "02-copyright-jpg-srgb",
+      "format": "jpg",
+      "metadata_mode": "copyrightOnly",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": null,
+      "comparison_count": 29,
+      "passed_comparison_count": 29,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "gps": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "caption": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "title": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "keywords": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "person": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "03-contact-jpg-srgb",
+      "format": "jpg",
+      "metadata_mode": "copyrightAndContactOnly",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": null,
+      "comparison_count": 31,
+      "passed_comparison_count": 31,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "gps": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "person": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "04-no-camera-jpg-srgb",
+      "format": "jpg",
+      "metadata_mode": "allExceptCameraInfo",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": null,
+      "comparison_count": 34,
+      "passed_comparison_count": 34,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "05-no-gps-jpg-srgb",
+      "format": "jpg",
+      "metadata_mode": "all",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": null,
+      "comparison_count": 36,
+      "passed_comparison_count": 36,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 0,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "06-all-png16-srgb",
+      "format": "png",
+      "metadata_mode": "all",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": "a80dcdbe174f4691fda22a999823121c208063963942a9b0be63436cc66f749e",
+      "upstream_privacy_observation": null,
+      "comparison_count": 37,
+      "passed_comparison_count": 37,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 16,
+        "format": "PNG"
+      }
+    },
+    {
+      "id": "07-all-webp-srgb",
+      "format": "webp",
+      "metadata_mode": "all",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": "a0a04bafd5200db8ba5aefeb33c21f76c6b2b0e919c344dc31e5a055ce412ff9",
+      "upstream_privacy_observation": null,
+      "comparison_count": 38,
+      "passed_comparison_count": 38,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "WEBP"
+      }
+    },
+    {
+      "id": "08-all-png16-adobe",
+      "format": "png",
+      "metadata_mode": "all",
+      "requested_profile": "AdobeRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "e5f6ffb83b6d3491301dd750975684cc5cc2a1951c994a14b08cfdaa0d75a041",
+      "body_pixels_sha256": "5509c24114933b1848eb98fe954702864db78124fa9287643b5063b9d1d83da6",
+      "upstream_privacy_observation": null,
+      "comparison_count": 37,
+      "passed_comparison_count": 37,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 16,
+        "format": "PNG"
+      }
+    },
+    {
+      "id": "09-all-png16-prophoto",
+      "format": "png",
+      "metadata_mode": "all",
+      "requested_profile": "ProPhotoRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "0a8ef7d1d958d98225b3b71d93d9e8e3cecd9c302e014973d025d2a977ecf27c",
+      "body_pixels_sha256": "be8f7ae4c7c967143dcae1ce50c617f301f9403359044066ac08bf344b4bf86f",
+      "upstream_privacy_observation": null,
+      "comparison_count": 37,
+      "passed_comparison_count": 37,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 16,
+        "format": "PNG"
+      }
+    },
+    {
+      "id": "10-all-jpg-adobe",
+      "format": "jpg",
+      "metadata_mode": "all",
+      "requested_profile": "AdobeRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "e5f6ffb83b6d3491301dd750975684cc5cc2a1951c994a14b08cfdaa0d75a041",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": null,
+      "comparison_count": 36,
+      "passed_comparison_count": 36,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "11-all-jpg-prophoto",
+      "format": "jpg",
+      "metadata_mode": "all",
+      "requested_profile": "ProPhotoRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "0a8ef7d1d958d98225b3b71d93d9e8e3cecd9c302e014973d025d2a977ecf27c",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": null,
+      "comparison_count": 36,
+      "passed_comparison_count": 36,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "13-no-person-jpg-srgb",
+      "format": "jpg",
+      "metadata_mode": "all",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        0,
+        0
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": null,
+      "upstream_privacy_observation": "Lightroom retained person data in its filtered TIFF despite the recorded removal request; final output is checked separately for explicit suppression.",
+      "comparison_count": 37,
+      "passed_comparison_count": 37,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 0,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1920,
+        "height": 1280,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1920,
+        "height": 1420,
+        "depth": 8,
+        "format": "JPEG"
+      }
+    },
+    {
+      "id": "12-virtual-crop-rotate-png16",
+      "format": "png",
+      "metadata_mode": "all",
+      "requested_profile": "sRGB",
+      "ok": true,
+      "body_offset": [
+        22,
+        22
+      ],
+      "icc_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+      "body_pixels_sha256": "d4e66462aab96fa880d31ba1917f842c93694517f2bdadc8e5cab1fec86536d9",
+      "upstream_privacy_observation": null,
+      "comparison_count": 37,
+      "passed_comparison_count": 37,
+      "failures": [],
+      "metadata": {
+        "camera": {
+          "tiff_tag_count": 19,
+          "final_tag_count": 19,
+          "tiff_values_sha256": "f91a9ef25f9ac65d3f8e5b99379dbbe911a0dfce1cb3f5a810af6815b3093c99"
+        },
+        "gps": {
+          "tiff_tag_count": 9,
+          "final_tag_count": 9,
+          "tiff_values_sha256": "442655c6c6766c0964c5837025d0193874be67ffb43a77dc3c957b39e212dab2"
+        },
+        "copyright": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "66be2c17b738735e795e1ab05a392db74005ae2a82754543409e51ba800396de"
+        },
+        "contact": {
+          "tiff_tag_count": 4,
+          "final_tag_count": 4,
+          "tiff_values_sha256": "6d31784181163ede344f1128e7ad6c8e7f1ed80e32376a16ae59ee8d48733863"
+        },
+        "caption": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "ddeba0c3f7e05ea56fe2887ef572553111a186450ac50e086f38ca1cb7e10ed9"
+        },
+        "title": {
+          "tiff_tag_count": 2,
+          "final_tag_count": 2,
+          "tiff_values_sha256": "91de822cf4acba09f76a3953868bb62ab9f65247debd23ffbd3bc60d1c49743c"
+        },
+        "keywords": {
+          "tiff_tag_count": 3,
+          "final_tag_count": 3,
+          "tiff_values_sha256": "b8a155c0ad4ced33ffd188b8bf4d40bedf8a5f58818841013322d54b0d0d1414"
+        },
+        "person": {
+          "tiff_tag_count": 1,
+          "final_tag_count": 1,
+          "tiff_values_sha256": "8dd1dccc5de20321a1a2a669faaf3b30e6708f0f7089fcb4cd11a31d84a60b78"
+        }
+      },
+      "tiff": {
+        "width": 1280,
+        "height": 1920,
+        "depth": 16,
+        "format": "TIFF"
+      },
+      "output": {
+        "width": 1324,
+        "height": 2057,
+        "depth": 16,
+        "format": "PNG"
+      }
+    }
+  ],
+  "virtual_copy": {
+    "master_tiff_size": [
+      1920,
+      1280
+    ],
+    "virtual_tiff_size": [
+      1280,
+      1920
+    ],
+    "develop_adjustments": {
+      "Exposure2012": {
+        "requested": 0.35,
+        "observed": 0.35
+      },
+      "Contrast2012": {
+        "requested": 12,
+        "observed": 12
+      }
+    },
+    "rendered_change_verified": true,
+    "baseline_evidence_path": "work/lr-sdk-output/20261007T155648Z-108020/evidence.json",
+    "nontrivial_crop_applied": true
+  }
+}
