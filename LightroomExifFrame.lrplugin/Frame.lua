@@ -98,11 +98,19 @@ local function normalized(path)
     return tostring(path or ''):gsub('\\', '/'):gsub('/+$', ''):lower()
 end
 
+local function joinPath(base, ...)
+    local current = base
+    for i = 1, select('#', ...) do
+        current = LrPathUtils.child(current, select(i, ...))
+    end
+    return current
+end
+
 local function loadCatalog()
     if cachedCatalog then return cachedCatalog end
     local candidates = {
-        LrPathUtils.child(_PLUGIN.path, 'bin/data/brands.json'),
-        LrPathUtils.child(LrPathUtils.parent(_PLUGIN.path), 'helper/data/brands.json'),
+        joinPath(_PLUGIN.path, 'bin', 'data', 'brands.json'),
+        joinPath(LrPathUtils.parent(_PLUGIN.path), 'helper', 'data', 'brands.json'),
     }
     for _, path in ipairs(candidates) do
         if LrFileUtils.exists(path) == 'file' then
@@ -200,7 +208,10 @@ function Frame.dateNotationItems(p)
     }
 end
 
-local winDir = os.getenv('WINDIR') or 'C:\\Windows'
+local defaultFont = 'C:\\Windows\\Fonts\\malgun.ttf'
+if LrFileUtils.exists(defaultFont) ~= 'file' and LrFileUtils.exists('C:\\Windows\\Fonts\\segoeui.ttf') == 'file' then
+    defaultFont = 'C:\\Windows\\Fonts\\segoeui.ttf'
+end
 Frame.defaults = {
     ef_language = 'auto',
     ef_outputFolder = '',
@@ -219,7 +230,7 @@ Frame.defaults = {
     ef_noCrop = false,
     ef_paddingInside = false,
     ef_compact = false,
-    ef_fontPath = LrPathUtils.child(winDir, 'Fonts\\malgun.ttf'),
+    ef_fontPath = defaultFont,
     ef_fontPercent = 1.65,
     ef_bandPercent = 7.3,
     ef_paddingPercent = 1.7,
@@ -459,6 +470,7 @@ function Frame.renderSettings(p)
     end
     p.LR_export_destinationType = 'tempFolder'
     p.LR_export_useSubfolder = false
+    p.LR_export_destinationPathSuffix = ''
     p.LR_reimportExportedPhoto = false
     p.LR_collisionHandling = 'rename'
     p.LR_extensionCase = 'lowercase'
@@ -510,8 +522,10 @@ function Frame.temporary(context)
     local base = LrPathUtils.getStandardFilePath('temp'):gsub('[\\/]+$', '')
     local leaf = 'exif-frame-' .. tostring(os.time()) .. '-' .. tostring(math.random(100000, 999999))
     local dir = LrFileUtils.chooseUniqueFileName(LrPathUtils.child(base, leaf))
-    local ok, errMsg = LrFileUtils.createAllDirectories(dir)
-    assert(ok, T('Cannot create temporary folder.', '임시 폴더를 만들 수 없습니다.') .. (errMsg and (' ' .. tostring(errMsg)) or ''))
+    local _, errMsg = LrFileUtils.createAllDirectories(dir)
+    assert(LrFileUtils.exists(dir) == 'directory',
+        T('Cannot create temporary folder.', '임시 폴더를 만들 수 없습니다.')
+            .. (errMsg and (' (' .. tostring(errMsg) .. ')') or ''))
     -- Only this newly created direct child is owned/deleted; never delete a user output folder.
     assert(normalized(LrPathUtils.parent(dir)) == normalized(base)
         and LrPathUtils.leafName(dir):match('^exif%-frame%-'))
@@ -577,8 +591,12 @@ function Frame.resolveDestinationDir(p, sourcePath, session)
             dir = LrPathUtils.child(dir, part)
         end
     end
-    local ok, errMsg = LrFileUtils.createAllDirectories(dir)
-    assert(ok, T('Cannot create destination folder: ', '대상 폴더를 만들 수 없습니다: ', p) .. tostring(dir))
+    if LrFileUtils.exists(dir) ~= 'directory' then
+        local _, errMsg = LrFileUtils.createAllDirectories(dir)
+        assert(LrFileUtils.exists(dir) == 'directory',
+            T('Cannot create destination folder: ', '대상 폴더를 만들 수 없습니다: ', p) .. tostring(dir)
+                .. (errMsg and (' (' .. tostring(errMsg) .. ')') or ''))
+    end
     return dir, nil
 end
 
@@ -958,20 +976,20 @@ function Frame.diagnostics()
         if type(v) == 'string' and v ~= '' then customCount = customCount + 1 end
     end
     local lines = {
-        'Lightroom EXIF Frame 0.2.0',
+        'Lightroom EXIF Frame 0.2.1',
         'Windows: ' .. tostring(WIN_ENV),
         T('Plug-in: ', '플러그인: ') .. _PLUGIN.path,
         'Built-in CI Brands: ' .. tostring(#brands),
         'Custom Logo Overrides: ' .. tostring(customCount),
     }
-    for _, file in ipairs({
-        'bin/frame-helper.exe',
-        'bin/imagemagick/magick.exe',
-        'bin/exiftool/exiftool.exe',
-        'bin/data/brands.json',
+    for _, parts in ipairs({
+        { 'bin', 'frame-helper.exe' },
+        { 'bin', 'imagemagick', 'magick.exe' },
+        { 'bin', 'exiftool', 'exiftool.exe' },
+        { 'bin', 'data', 'brands.json' },
     }) do
-        local path = LrPathUtils.child(_PLUGIN.path, file)
-        lines[#lines + 1] = (LrFileUtils.exists(path) == 'file' and '[OK] ' or '[MISSING] ') .. file
+        local path = joinPath(_PLUGIN.path, unpack(parts))
+        lines[#lines + 1] = (LrFileUtils.exists(path) == 'file' and '[OK] ' or '[MISSING] ') .. table.concat(parts, '/')
     end
     lines[#lines + 1] = T('Logo paths are stored only in this plug-in’s preferences.',
         '사용자 로고 경로는 이 플러그인의 환경설정에만 저장됩니다.')

@@ -1,4 +1,4 @@
-# Frame Helper Protocol (`schema_version = 1`, Plug-in `0.2.0`)
+# Frame Helper Protocol (`schema_version = 1`, Plug-in `0.2.1`)
 
 `LightroomExifFrame.lrplugin` (Lua) spawns `bin/frame-helper.exe` (PyInstaller frozen Python + ImageMagick 7 Q16 + ExifTool 13.59 + `resvg_py`) with no shell expansion (`LrTasks.execute` extra outer quotes on Windows).
 

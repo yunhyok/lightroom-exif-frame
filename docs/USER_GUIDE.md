@@ -1,4 +1,4 @@
-# Lightroom EXIF Frame 사용자 가이드 (`v0.2.0`)
+# Lightroom EXIF Frame 사용자 가이드 (`v0.2.1`)
 
 이 문서는 **Lightroom EXIF Frame** 플러그인의 내보내기 UI 구성, 시대별 제조사 CI 로고 동작 방식, 16가지 프레임 테마 및 메타데이터 옵션을 안내합니다.
 

@@ -1,6 +1,6 @@
 local Frame = require 'Frame'
 return { sectionsForTopOfDialog = function(f)
-    return {{ title = 'Lightroom EXIF Frame 0.2.0',
+    return {{ title = 'Lightroom EXIF Frame 0.2.1',
         f:static_text {title = Frame.text('Windows • Lightroom Classic 13+ API • 16 Themes • Historical Brand CI Logos',
             'Windows • Lightroom Classic 13+ API • 16개 프레임 테마 • 카메라 연대별 제조사 CI 로고')},
         f:static_text {title = Frame.text('Choose EXIF Frame in Export To. Uses native Export Location and File Naming; add custom PNG/SVG logos in the export dialog.',

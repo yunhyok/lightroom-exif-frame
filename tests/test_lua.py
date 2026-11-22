@@ -21,6 +21,8 @@ PLUGIN = ROOT / "LightroomExifFrame.lrplugin"
 SDK = r'''
 WIN_ENV = true
 _PLUGIN = {path = PLUGIN_PATH}
+-- Match Adobe Lightroom Classic's Lua sandbox: strip os.getenv, os.execute, etc.
+os = { time = os.time, date = os.date, clock = os.clock, difftime = os.difftime }
 local prefs = {}
 messages, renderedSettings, calls = {}, {}, {}
 REIMPORTED, REVEALED_PATHS, CONFIRM_CALLS = {}, {}, {}
@@ -178,9 +180,10 @@ class LuaTests(unittest.TestCase):
     @staticmethod
     def create(path):
         p = Path(path)
-        created = not p.exists()
+        existed = p.exists()
         p.mkdir(parents=True, exist_ok=True)
-        return True, created
+        # Adobe Lightroom Classic returns (false, nil) when all directories already exist.
+        return (not existed), None
 
     def delete(self, path):
         p = Path(path)

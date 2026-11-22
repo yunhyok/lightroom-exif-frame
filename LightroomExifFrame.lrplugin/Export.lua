@@ -171,6 +171,9 @@ end
 local function sectionLogoCI(f, p)
     local T = function(en, ko) return Frame.T(en, ko, p) end
     local manualEnabled = bind('ef_manualEnabled')
+    if not p.ef_eraItems then
+        p.ef_eraItems = Frame.eraItemsForBrand(p.ef_manualBrand, p)
+    end
     return {
         title = T('EXIF Frame — Camera Logo & Historical CI', 'EXIF Frame — 제조사 로고 및 연대별 CI'),
         bind_to_object = p,

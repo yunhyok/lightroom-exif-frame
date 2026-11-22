@@ -1,4 +1,4 @@
-# Lightroom EXIF Frame (`v0.2.0`)
+# Lightroom EXIF Frame (`v0.2.1`)
 
 Lightroom Classic (Windows x64, SDK 13+)용 **고품질 EXIF 프레임 & 시대별 제조사 CI 로고** 내보내기 플러그인입니다.
 
@@ -6,7 +6,7 @@ Lightroom Classic (Windows x64, SDK 13+)용 **고품질 EXIF 프레임 & 시대�
 
 ---
 
-## 주요 특징 (v0.2.0)
+## 주요 특징 (v0.2.1)
 
 ### 1. Lightroom 기본 **내보내기 위치(Export Location)** 및 **파일 이름 지정(File Naming)** 네이티브 연동
 - 내보내기 창 상단에 Lightroom의 기본 **내보내기 위치**(`특정 폴더`, `원본 사진과 동일한 폴더`, `나중에 폴더 선택`, `바탕 화면/사진/문서` 표준 폴더, `하위 폴더에 넣기`, `이 카탈로그에 추가 / 스택`, `기존 파일 처리: 덮어쓰기/새 이름/건너뛰기/묻기`)와 **파일 이름 지정**(토큰 프리셋, 소문자/대문자 확장자) 패널을 그대로 사용합니다.
@@ -36,7 +36,7 @@ Lightroom Classic (Windows x64, SDK 13+)용 **고품질 EXIF 프레임 & 시대�
 
 ## 설치 및 사용 방법
 
-1. [Releases](https://github.com/yunhyok/lightroom-exif-frame/releases)에서 최신 `Lightroom-EXIF-Frame-0.2.0-Windows-x64.zip`을 다운로드하고 압축을 풉니다. (SHA-256 체크섬 검증 권장)
+1. [Releases](https://github.com/yunhyok/lightroom-exif-frame/releases)에서 최신 `Lightroom-EXIF-Frame-0.2.1-Windows-x64.zip`을 다운로드하고 압축을 풉니다. (SHA-256 체크섬 검증 권장)
 2. Lightroom Classic → **파일(File) → 플러그인 관리자(Plug-in Manager) → 추가(Add)**에서 `LightroomExifFrame.lrplugin` 폴더를 선택합니다.
 3. **내보내기(Export)** 대화상자 최상단의 **내보낼 위치(Export To)**에서 **EXIF Frame**을 선택합니다.
 4. 자세한 사용법과 설정 설명은 [docs/USER_GUIDE.md](docs/USER_GUIDE.md)를 확인하세요.
