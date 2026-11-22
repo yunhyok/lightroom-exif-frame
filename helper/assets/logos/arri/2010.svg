@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 160" width="390" height="160">
+  <path d="M 16 128 L 64 32 L 112 128 L 92 128 L 64 68 L 36 128 Z" fill="#005BA6"/>
+  <g transform="translate(126,36) scale(0.86)">
+  <path d="M 27.52 0 L 45.92 0 L 73.44 100 L 56.64 100 L 36.72 16 L 16.8 100 L 0 100 Z M 16.16 62 L 57.28 62 L 57.28 77.04 L 16.16 77.04 Z" transform="translate(0,0)" fill="#005BA6" fill-rule="nonzero"/>
+  <path d="M 0 0 L 16 0 L 16 100 L 0 100 Z M 0 0 L 34.68 0 A 34.68 27.5 0 0 1 34.68 55 L 0 55 Z M 16 15.04 L 16 39.96 L 34.68 39.96 A 18.68 12.46 0 0 0 34.68 15.04 Z M 30.52 50 L 43 50 L 69.36 100 L 50.96 100 Z" transform="translate(85.44,0)" fill="#005BA6" fill-rule="nonzero"/>
+  <path d="M 0 0 L 16 0 L 16 100 L 0 100 Z M 0 0 L 34.68 0 A 34.68 27.5 0 0 1 34.68 55 L 0 55 Z M 16 15.04 L 16 39.96 L 34.68 39.96 A 18.68 12.46 0 0 0 34.68 15.04 Z M 30.52 50 L 43 50 L 69.36 100 L 50.96 100 Z" transform="translate(166.8,0)" fill="#005BA6" fill-rule="nonzero"/>
+  <path d="M 3.63 0 L 19.63 0 L 19.63 100 L 3.63 100 Z" transform="translate(248.16,0)" fill="#005BA6" fill-rule="nonzero"/>
+</g>
+</svg>

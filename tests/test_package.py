@@ -77,6 +77,25 @@ class PackageSmokeTests(unittest.TestCase):
         tags = json.loads(result.stdout)[0]
         self.assertEqual(tags.get("Artist"), "Filtered Package Copyright")
 
+    def test_frozen_inspect_cli_without_dev_runtime(self):
+        inspect_res = self.folder / "inspect-res.json"
+        inspect_job = self.folder / "inspect-job [한글].json"
+        inspect_job.write_text(json.dumps({
+            "schema_version": 1,
+            "result_path": str(inspect_res),
+            "logo_mode": "auto_era",
+            "metadata": {"make": "EASTMAN KODAK COMPANY", "model": "KODAK C875 ZOOM DIGITAL CAMERA"},
+        }, ensure_ascii=False), encoding="utf-8-sig")
+        completed = subprocess.run([str(self.helper), "--inspect", str(inspect_job)], cwd=self.folder,
+                                   env=self.environment, shell=False, capture_output=True, timeout=180,
+                                   creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        self.assertEqual(completed.returncode, 0, completed.stderr.decode("utf-8", "replace"))
+        res = json.loads(inspect_res.read_text(encoding="utf-8"))
+        self.assertTrue(res["ok"])
+        self.assertEqual(res["brand_info"]["brand_id"], "kodak")
+        self.assertEqual(res["brand_info"]["era_id"], "2006")
+        self.assertEqual(res["brand_info"]["logo_source"], "builtin_svg")
+
     def test_frozen_outputs_and_failure_with_no_development_runtime_paths(self):
         self.assertFalse(any(key.upper().startswith("EXIF_FRAME_") for key in self.environment))
         self.assertNotIn("PYTHONHOME", self.environment)
@@ -92,6 +111,10 @@ class PackageSmokeTests(unittest.TestCase):
             code, result = self.invoke(job, fmt)
             self.assertEqual(code, 0, result)
             self.assertTrue(result["ok"], result)
+            self.assertEqual(result["brand_info"]["brand_id"], "pentax")
+            self.assertEqual(result["brand_info"]["era_id"], "1987")
+            self.assertEqual(result["brand_info"]["logo_source"], "builtin_svg")
+            self.assertEqual((self.bundle / "licenses" / "RESVG_PY.txt").is_file(), True)
             self.assertEqual((result["width"], result["height"]), (512, 357))
             output = Path(result["output_path"])
             outputs[fmt] = output

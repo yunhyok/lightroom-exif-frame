@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="400" height="160">
+  <g transform="translate(18,30) scale(0.92)">
+  <path d="M 0 0 L 18 0 L 18 100 L 0 100 Z M 0 0 L 34.68 0 A 34.68 27.5 0 0 1 34.68 55 L 0 55 Z M 18 16.92 L 18 38.08 L 34.68 38.08 A 16.68 10.58 0 0 0 34.68 16.92 Z M 30.52 50 L 43 50 L 69.36 100 L 48.66 100 Z" transform="translate(0,0)" fill="#D61B3E" fill-rule="nonzero"/>
+</g>
+  <g transform="translate(95.81,30) scale(0.92)">
+  <path d="M 2.63 0 L 20.63 0 L 20.63 100 L 2.63 100 Z" transform="translate(0,0)" fill="none" stroke="#D61B3E" stroke-width="4.2" stroke-linejoin="miter"/>
+  <path d="M 68.14 78.68 A 37.45 50 0 1 1 68.14 21.32 L 53.39 31.03 A 19.45 33.08 0 1 0 53.39 68.97 Z" transform="translate(35.26,0)" fill="none" stroke="#D61B3E" stroke-width="4.2" stroke-linejoin="miter"/>
+  <path d="M 0 50 A 38.76 50 0 1 1 77.52 50 A 38.76 50 0 1 1 0 50 Z M 18 50 A 20.76 33.08 0 1 0 59.52 50 A 20.76 33.08 0 1 0 18 50 Z" transform="translate(116.62,0)" fill="none" stroke="#D61B3E" stroke-width="4.2" stroke-linejoin="miter"/>
+  <path d="M 0 0 L 18 0 L 18 100 L 0 100 Z M 51.36 0 L 69.36 0 L 69.36 100 L 51.36 100 Z M 0 41.54 L 69.36 41.54 L 69.36 58.46 L 0 58.46 Z" transform="translate(206.14,0)" fill="none" stroke="#D61B3E" stroke-width="4.2" stroke-linejoin="miter"/>
+</g>
+</svg>

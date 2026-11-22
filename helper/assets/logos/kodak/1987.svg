@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" width="520" height="160">
+  <rect x="10" y="10" width="124" height="140" rx="10" fill="#FFB700"/>
+  <path d="M 22 22 L 118 22 L 118 46 L 56 80 L 118 114 L 118 138 L 22 138 L 22 108 L 44 108 L 44 52 L 22 52 Z" fill="{{KODAK_K}}"/>
+  <g transform="translate(146,36) scale(0.86)">
+  <path d="M 0 0 L 16 0 L 16 100 L 0 100 Z M 11.2 52 L 49.84 0 L 66.64 0 L 18.4 58 Z M 18.4 44 L 66.64 100 L 49.36 100 L 11.52 54 Z" transform="translate(0,0)" fill="#ED0000" fill-rule="nonzero"/>
+  <path d="M 0 63 A 28.42 37 0 1 1 56.84 63 A 28.42 37 0 1 1 0 63 Z M 14.4 63 A 14.02 24.07 0 1 0 42.44 63 A 14.02 24.07 0 1 0 14.4 63 Z" transform="translate(74.64,0)" fill="#ED0000" fill-rule="nonzero"/>
+  <path d="M 42.12 0 L 56.84 0 L 56.84 100 L 42.12 100 Z M 0 63 A 25.58 37 0 1 1 51.16 63 A 25.58 37 0 1 1 0 63 Z M 14.08 63 A 11.5 24.22 0 1 0 37.08 63 A 11.5 24.22 0 1 0 14.08 63 Z" transform="translate(139.48,0)" fill="#ED0000" fill-rule="nonzero"/>
+  <path d="M 0 63 A 24.7 37 0 1 1 49.39 63 A 24.7 37 0 1 1 0 63 Z M 14.08 63 A 10.62 24.22 0 1 0 35.31 63 A 10.62 24.22 0 1 0 14.08 63 Z M 40.16 26 L 54.88 26 L 54.88 100 L 40.16 100 Z" transform="translate(204.32,0)" fill="#ED0000" fill-rule="nonzero"/>
+  <path d="M 0 0 L 14.72 0 L 14.72 100 L 0 100 Z M 11.2 65 L 37.72 28 L 52.92 28 L 18.4 70 Z M 17.6 56 L 52.92 100 L 37.24 100 L 11.2 66 Z" transform="translate(267.2,0)" fill="#ED0000" fill-rule="nonzero"/>
+</g>
+</svg>

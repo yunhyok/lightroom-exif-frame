@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 160" width="310" height="160">
+  <circle cx="76" cy="80" r="64" fill="#FD312E"/><path d="M 76 36 L 76 86 L 94 86" fill="none" stroke="{{BADGE_FG}}" stroke-width="8" stroke-linecap="square"/><circle cx="52" cy="58" r="7" fill="{{BADGE_FG}}"/><path d="M 116 78 A 42 42 0 1 1 76 38 M 92 78 L 118 78" fill="none" stroke="{{BADGE_FG}}" stroke-width="8" stroke-linecap="round"/>
+  <g transform="translate(158,34) scale(0.9)">
+  <path d="M 0 0 L 13.5 0 L 13.5 100 L 0 100 Z M 0 87.31 L 56 87.31 L 56 100 L 0 100 Z" transform="translate(0,0)" fill="{{INK_MUTED}}" fill-rule="nonzero"/>
+  <path d="M 71.98 51.74 A 36 50 0 1 1 65.85 22.04 L 54.65 29.14 A 22.5 37.31 0 1 0 58.49 51.3 Z M 37.44 49 L 72 49 L 72 61.69 L 37.44 61.69 Z M 58.5 49 L 72 49 L 72 91 L 58.5 91 Z" transform="translate(66,0)" fill="{{INK_MUTED}}" fill-rule="nonzero"/>
+</g>
+</svg>

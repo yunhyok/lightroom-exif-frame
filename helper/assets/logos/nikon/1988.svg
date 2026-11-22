@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 160" width="360" height="160">
+  <g transform="translate(35.76,30) scale(0.98) matrix(1 0 -0.24 1 0 0)">
+  <path d="M 0 0 L 17.1 0 L 17.1 100 L 0 100 Z M 54.3 0 L 71.4 0 L 71.4 100 L 54.3 100 Z M 0 0 L 18.9 0 L 71.4 100 L 52.5 100 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 2.92 28 L 19.12 28 L 19.12 100 L 2.92 100 Z M 1.66 10 A 9.36 9.36 0 1 1 20.38 10 A 9.36 9.36 0 1 1 1.66 10 Z" transform="translate(79.4,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 16.56 0 L 16.56 100 L 0 100 Z M 12.6 65 L 37.98 28 L 55.08 28 L 20.7 70 Z M 19.8 56 L 55.08 100 L 37.44 100 L 12.6 66 Z" transform="translate(109.43,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 63 A 29.58 37 0 1 1 59.16 63 A 29.58 37 0 1 1 0 63 Z M 16.2 63 A 13.38 22.45 0 1 0 42.96 63 A 13.38 22.45 0 1 0 16.2 63 Z" transform="translate(172.51,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 28 L 16.56 28 L 16.56 100 L 0 100 Z M 40.56 54 L 57.12 54 L 57.12 100 L 40.56 100 Z M 0 56 A 28.56 30 0 0 1 57.12 56 L 40.92 56 A 12.36 15.62 0 0 0 16.2 56 Z" transform="translate(239.67,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+</svg>

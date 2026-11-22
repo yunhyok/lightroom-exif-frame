@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 160" width="580" height="160">
+  <rect x="12" y="20" width="132" height="120" rx="8" fill="#00843D"/>
+  <rect x="12" y="100" width="132" height="6" fill="{{CONTRAST}}"/>
+  <rect x="12" y="106" width="132" height="18" fill="#FB0020"/>
+  <g transform="translate(28,36) scale(0.44)">
+  <path d="M 0 0 L 17 0 L 17 100 L 0 100 Z M 0 0 L 58 0 L 58 15.98 L 0 15.98 Z M 0 42.01 L 47.56 42.01 L 47.56 57.99 L 0 57.99 Z" transform="translate(0,0)" fill="{{BADGE_FG}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 17 0 L 17 68 L 0 68 Z M 51 0 L 68 0 L 68 68 L 51 68 Z M 68 66 A 34 34 0 0 1 0 66 L 17 66 A 17 18.02 0 0 0 51 66 Z" transform="translate(66,0)" fill="{{BADGE_FG}}" fill-rule="nonzero"/>
+  <path d="M 37 0 L 54 0 L 54 68 L 37 68 Z M 54 66 A 28.08 34 0 0 1 -1.55 73.07 L 15.08 69.75 A 11.08 18.02 0 0 0 37 66 Z" transform="translate(142,0)" fill="{{BADGE_FG}}" fill-rule="nonzero"/>
+  <path d="M 2.9 0 L 19.9 0 L 19.9 100 L 2.9 100 Z" transform="translate(204,0)" fill="{{BADGE_FG}}" fill-rule="nonzero"/>
+</g>
+  <g transform="translate(162,40) scale(0.76)">
+  <path d="M 0 0 L 15.5 0 L 15.5 100 L 0 100 Z M 0 0 L 53.36 0 L 53.36 14.57 L 0 14.57 Z M 0 42.72 L 43.76 42.72 L 43.76 57.29 L 0 57.29 Z" transform="translate(0,0)" fill="#00843D" fill-rule="nonzero"/>
+  <path d="M 0 0 L 15.5 0 L 15.5 68 L 0 68 Z M 47.06 0 L 62.56 0 L 62.56 68 L 47.06 68 Z M 62.56 66 A 31.28 34 0 0 1 0 66 L 15.5 66 A 15.78 19.43 0 0 0 47.06 66 Z" transform="translate(61.36,0)" fill="#00843D" fill-rule="nonzero"/>
+  <path d="M 34.18 0 L 49.68 0 L 49.68 68 L 34.18 68 Z M 49.68 66 A 25.83 34 0 0 1 -1.42 73.07 L 13.74 70.04 A 10.33 19.43 0 0 0 34.18 66 Z" transform="translate(131.92,0)" fill="#00843D" fill-rule="nonzero"/>
+  <path d="M 3.05 0 L 18.55 0 L 18.55 100 L 3.05 100 Z" transform="translate(189.6,0)" fill="#00843D" fill-rule="nonzero"/>
+  <path d="M 0 0 L 15.5 0 L 15.5 100 L 0 100 Z M 0 0 L 53.36 0 L 53.36 14.57 L 0 14.57 Z M 0 42.72 L 43.76 42.72 L 43.76 57.29 L 0 57.29 Z" transform="translate(219.2,0)" fill="#00843D" fill-rule="nonzero"/>
+  <path d="M 3.05 0 L 18.55 0 L 18.55 100 L 3.05 100 Z" transform="translate(280.56,0)" fill="#00843D" fill-rule="nonzero"/>
+  <path d="M 0 0 L 15.5 0 L 15.5 100 L 0 100 Z M 0 85.43 L 51.52 85.43 L 51.52 100 L 0 100 Z" transform="translate(310.16,0)" fill="#00843D" fill-rule="nonzero"/>
+  <path d="M 0 0 L 14.72 0 L 14.72 100 L 0 100 Z M 60.71 0 L 75.44 0 L 75.44 100 L 60.71 100 Z M 0 0 L 16.28 0 L 37.72 72 L 59.16 0 L 75.44 0 L 75.44 14 L 44.7 92 L 30.74 92 L 0 14 Z" transform="translate(369.68,0)" fill="#00843D" fill-rule="nonzero"/>
+</g>
+</svg>

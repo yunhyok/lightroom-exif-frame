@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 160" width="500" height="160">
+  <defs><clipPath id="nikon-sq"><rect x="10" y="10" width="140" height="140" rx="10"/></clipPath></defs>
+  <rect x="10" y="10" width="140" height="140" rx="10" fill="#FFE100"/>
+  <g transform="translate(10,10)" clip-path="url(#nikon-sq)">
+    <path d="M 0 128 L 148 88 L 148 108 L 0 144 Z" fill="{{BADGE_FG}}"/>
+    <path d="M 0 104 L 148 52 L 148 70 L 0 118 Z" fill="{{BADGE_FG}}"/>
+    <path d="M 0 82 L 148 20 L 148 36 L 0 94 Z" fill="{{BADGE_FG}}"/>
+    <path d="M 0 62 L 132 0 L 148 0 L 148 6 L 0 72 Z" fill="{{BADGE_FG}}"/>
+    <path d="M 0 44 L 92 0 L 116 0 L 0 52 Z" fill="{{BADGE_FG}}"/>
+  </g>
+  <g transform="translate(185.04,34) scale(0.92) matrix(1 0 -0.24 1 0 0)">
+  <path d="M 0 0 L 17.57 0 L 17.57 100 L 0 100 Z M 53.83 0 L 71.4 0 L 71.4 100 L 53.83 100 Z M 0 0 L 19.43 0 L 71.4 100 L 51.98 100 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 2.69 28 L 19.34 28 L 19.34 100 L 2.69 100 Z M 1.4 10 A 9.62 9.62 0 1 1 20.64 10 A 9.62 9.62 0 1 1 1.4 10 Z" transform="translate(79.4,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 17.02 0 L 17.02 100 L 0 100 Z M 12.95 65 L 37.5 28 L 55.08 28 L 21.27 70 Z M 20.35 56 L 55.08 100 L 36.95 100 L 12.95 66 Z" transform="translate(109.43,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 63 A 29.58 37 0 1 1 59.16 63 A 29.58 37 0 1 1 0 63 Z M 16.65 63 A 12.93 22.04 0 1 0 42.51 63 A 12.93 22.04 0 1 0 16.65 63 Z" transform="translate(172.51,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 28 L 17.02 28 L 17.02 100 L 0 100 Z M 40.1 54 L 57.12 54 L 57.12 100 L 40.1 100 Z M 0 56 A 28.56 30 0 0 1 57.12 56 L 40.47 56 A 11.91 15.22 0 0 0 16.65 56 Z" transform="translate(239.67,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+</svg>

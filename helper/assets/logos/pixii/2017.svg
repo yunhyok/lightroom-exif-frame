@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 319 160" width="319" height="160">
+  <g transform="translate(22,34) scale(0.82)">
+  <path d="M 0 0 L 9.5 0 L 9.5 100 L 0 100 Z M 0 0 L 32 0 A 32 28 0 0 1 32 56 L 0 56 Z M 9.5 8.93 L 9.5 47.07 L 32 47.07 A 22.5 19.07 0 0 0 32 8.93 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 6.65 0 L 16.15 0 L 16.15 100 L 6.65 100 Z" transform="translate(98,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 10.92 0 L 68 100 L 57.08 100 Z M 57.08 0 L 68 0 L 10.92 100 L 0 100 Z" transform="translate(154.8,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 6.65 0 L 16.15 0 L 16.15 100 L 6.65 100 Z" transform="translate(256.8,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 6.65 0 L 16.15 0 L 16.15 100 L 6.65 100 Z" transform="translate(313.6,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+</svg>

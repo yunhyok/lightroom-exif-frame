@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 160" width="488" height="160">
+  <g transform="translate(22,34) scale(0.8)">
+  <path d="M 66.8 78.68 A 36.72 50 0 1 1 66.8 21.32 L 58.2 26.98 A 26.22 40.13 0 1 0 58.2 73.02 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 50 A 38 50 0 1 1 76 50 A 38 50 0 1 1 0 50 Z M 10.5 50 A 27.5 40.13 0 1 0 65.5 50 A 27.5 40.13 0 1 0 10.5 50 Z" transform="translate(96,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 9.97 0 L 9.97 100 L 0 100 Z M 60.02 0 L 70 0 L 70 100 L 60.02 100 Z M 0 0 L 11.03 0 L 70 100 L 58.98 100 Z" transform="translate(200,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 62 0 L 62 9.87 L 0 9.87 Z M 25.75 0 L 36.25 0 L 36.25 100 L 25.75 100 Z" transform="translate(298,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 29.96 0 L 42.04 0 L 72 100 L 60.98 100 L 36 16 L 11.03 100 L 0 100 Z M 15.84 62 L 56.16 62 L 56.16 71.87 L 15.84 71.87 Z" transform="translate(388,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 12.07 0 L 68 100 L 55.92 100 Z M 55.92 0 L 68 0 L 12.07 100 L 0 100 Z" transform="translate(488,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+</svg>

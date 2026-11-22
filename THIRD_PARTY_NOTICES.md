@@ -1,8 +1,9 @@
 # Third-party programs
 
-The plug-in's original Lua and Python source is MIT licensed. The programs below
-run as separate executables and retain their own licenses. Camera logos and
-Windows fonts are not distributed.
+The plug-in's original Lua and Python source is MIT licensed. Built-in pure-vector
+era brand CI SVGs (rendered locally without remote font or web fetches) and the
+hardware release-year database are bundled in the helper package; Windows fonts
+and optional user PNG/SVG logo overrides remain local.
 
 Paths below are relative to the extracted `LightroomExifFrame.lrplugin` folder.
 These generated runtime files are included in release ZIPs, not in the source
@@ -12,6 +13,7 @@ checkout. The ExifTool upstream test-image directory is omitted from the bundle.
 | --- | --- | --- |
 | ImageMagick Q16 x64 | [7.1.2-32](https://github.com/ImageMagick/ImageMagick/releases/tag/7.1.2-32) | `bin/imagemagick/LICENSE.txt`, `NOTICE.txt` (including bundled delegate notices) |
 | ExifTool | [13.59](https://github.com/exiftool/exiftool/tree/13.59), [official Windows packager](https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows) | `bin/exiftool/exiftool_files` contains upstream licenses and Strawberry Perl notices |
+| resvg / resvg-py | [0.5.0](https://github.com/linebender/resvg) | `bin/licenses/RESVG_PY.txt` (MPL-2.0 / MIT / Apache-2.0) |
 | CPython | [3.12](https://www.python.org/downloads/source/) | `bin/licenses/PYTHON.txt` includes the Python runtime and standard-library notices |
 | OpenSSL (CPython dependency) | [3.x](https://github.com/openssl/openssl); exact build version in `bin/licenses/RUNTIME.txt` | `bin/licenses/OPENSSL.txt`, Apache 2.0; copyright The OpenSSL Project Authors and contributors |
 | PyInstaller | [6.22.3](https://pyinstaller.org/) | `bin/licenses/PYINSTALLER.txt`; GPL with bootloader exception |

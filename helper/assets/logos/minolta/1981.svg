@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" width="520" height="160">
+  <defs><clipPath id="min-g"><circle cx="62" cy="62" r="56"/></clipPath></defs>
+  <g transform="translate(14,18)">
+    <circle cx="62" cy="62" r="56" fill="#005BAC"/>
+    <g clip-path="url(#min-g)">
+      <rect x="0" y="12" width="124" height="16" fill="{{BADGE_FG}}"/>
+      <rect x="0" y="34" width="124" height="15" fill="{{BADGE_FG}}"/>
+      <rect x="0" y="56" width="124" height="14" fill="{{BADGE_FG}}"/>
+      <rect x="0" y="77" width="124" height="12" fill="{{BADGE_FG}}"/>
+      <rect x="0" y="96" width="124" height="10" fill="{{BADGE_FG}}"/>
+    </g>
+  </g>
+  <g transform="translate(150,32) scale(0.72)">
+  <path d="M 0 28 L 12.15 28 L 12.15 100 L 0 100 Z M 32.46 52 L 44.61 52 L 44.61 100 L 32.46 100 Z M 64.93 52 L 77.08 52 L 77.08 100 L 64.93 100 Z M 0 54 A 20.81 28 0 0 1 41.62 54 L 29.74 54 A 8.93 17.59 0 0 0 11.88 54 Z M 35.46 54 A 20.81 28 0 0 1 77.08 54 L 65.2 54 A 8.93 17.59 0 0 0 47.34 54 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 4.12 28 L 16.27 28 L 16.27 100 L 4.12 100 Z M 3.18 10 A 7.02 7.02 0 1 1 17.22 10 A 7.02 7.02 0 1 1 3.18 10 Z" transform="translate(87.08,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 28 L 12.42 28 L 12.42 100 L 0 100 Z M 40.22 54 L 52.64 54 L 52.64 100 L 40.22 100 Z M 0 56 A 26.32 30 0 0 1 52.64 56 L 40.49 56 A 14.17 19.21 0 0 0 12.15 56 Z" transform="translate(117.48,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 63 A 27.26 37 0 1 1 54.52 63 A 27.26 37 0 1 1 0 63 Z M 12.15 63 A 15.11 26.09 0 1 0 42.37 63 A 15.11 26.09 0 1 0 12.15 63 Z" transform="translate(180.12,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 3.99 0 L 16.41 0 L 16.41 100 L 3.99 100 Z" transform="translate(244.64,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 9.48 6 L 21.63 6 L 21.63 80 L 9.48 80 Z M 0 28 L 29.78 28 L 29.78 38.41 L 0 38.41 Z M 23.69 100 A 14.21 20 0 0 1 9.53 78.26 L 20.96 79.14 A 2.74 9.85 0 0 0 23.69 89.85 Z" transform="translate(275.04,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 63 A 23.69 37 0 1 1 47.38 63 A 23.69 37 0 1 1 0 63 Z M 11.88 63 A 11.81 26.21 0 1 0 35.5 63 A 11.81 26.21 0 1 0 11.88 63 Z M 40.22 26 L 52.64 26 L 52.64 100 L 40.22 100 Z" transform="translate(318.88,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+</svg>

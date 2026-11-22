@@ -240,6 +240,160 @@ class RenderTests(unittest.TestCase):
         with patch.object(sys, "stderr", None):
             self.assertEqual(renderer.main(["--job", str(jobfile)]), 1)
 
+    def test_all_16_themes_aspect_ratios_and_padding_inside(self):
+        import themes as theme_mod
+        for idx, name in enumerate(sorted(theme_mod.THEMES)):
+            job = dict(
+                self.job,
+                theme=name,
+                appearance="auto",
+                label="SPRING 2026" if name in ("one_line", "two_line", "poster", "tip") else "",
+                output_path=str(self.folder / f"theme_{idx}_{name}.jpg"),
+                result_path=str(self.folder / f"theme_{idx}_{name}.json"),
+                metadata={
+                    "make": "EASTMAN KODAK COMPANY",
+                    "model": "KODAK C875 ZOOM DIGITAL CAMERA",
+                    "lens": "37-185mm",
+                    "iso": "78",
+                    "aperture": "2.8",
+                    "shutter": "1/32",
+                    "focal": "7.8",
+                    "focal35": "37",
+                    "date": "2026:01:11 02:47:03",
+                },
+            )
+            res = renderer.render(job)
+            self.assertTrue(res["ok"], name)
+            self.assertTrue(Path(res["output_path"]).is_file(), name)
+            self.assertGreater(res["width"], 0)
+            self.assertGreater(res["height"], 0)
+            self.assertEqual(res["brand_info"]["brand_id"], "kodak")
+            self.assertEqual(res["brand_info"]["era_id"], "2006")
+
+        # Cropped 1:1 -> square canvas + strap bottom band
+        crop_job = dict(
+            self.job, theme="strap", aspect_ratio="1:1", no_crop=False,
+            output_path=str(self.folder / "crop_1_1.jpg"),
+        )
+        res_crop = renderer.render(crop_job)
+        self.assertLess(res_crop["width"], 384)  # 256 square body + footer band
+        self.assertEqual(res_crop["width"], 256)
+
+        # Uncropped 1:1 with padding -> width=384, height=384 + strap band
+        nocrop_job = dict(
+            self.job, theme="strap", aspect_ratio="1:1", no_crop=True,
+            output_path=str(self.folder / "nocrop_1_1.jpg"),
+        )
+        res_nocrop = renderer.render(nocrop_job)
+        self.assertEqual(res_nocrop["width"], 384)
+        self.assertGreater(res_nocrop["height"], 384)
+
+        # padding_inside keeps canvas equal to effective body size
+        inside_job = dict(
+            self.job, theme="monitor", padding_inside=True, compact=True,
+            output_path=str(self.folder / "inside_monitor.jpg"),
+        )
+        res_inside = renderer.render(inside_job)
+        self.assertEqual((res_inside["width"], res_inside["height"]), (self.width, self.height))
+
+    def test_date_notations_ratio_focal_overrides_toggles_and_visibility(self):
+        import formatting
+        base_meta = {
+            "make": "NIKON CORPORATION",
+            "model": "NIKON Z 8",
+            "lens": "NIKKOR Z 50mm f/1.8 S",
+            "iso": "100",
+            "aperture": "1.8",
+            "shutter": "1/500",
+            "focal": "50",
+            "focal35": "50",
+            "date": "2026:01:11 02:47:03",
+        }
+        expected_dates = {
+            "slash_datetime": "2026/01/11 02:47:03",
+            "dash_datetime": "2026-01-11 02:47:03",
+            "ko_datetime": "2026년 01월 11일 02시 47분",
+            "ja_datetime": "2026年01月11日 02時47分",
+            "slash_date": "2026/01/11",
+            "dash_date": "2026-01-11",
+            "ko_date": "2026년 01월 11일",
+            "ja_date": "2026年01月11日",
+            "en_date": "Jan 11, 2026",
+            "none": "",
+        }
+        self.assertEqual(set(expected_dates), formatting.DATE_NOTATIONS)
+        for notation, exp in expected_dates.items():
+            job = renderer.validate(dict(self.job, date_notation=notation, focal_mode="ratio", crop_factor=1.5, metadata=base_meta))
+            texts, brand = renderer.visible_text(job, self.exiftool, [])
+            self.assertEqual(brand, "NIKON")
+            self.assertIn("75mm", texts[0])
+            self.assertEqual(texts[1], exp or "—")
+
+        # Toggles + overrides
+        masked = renderer.validate(dict(
+            self.job,
+            metadata=base_meta,
+            show_make=False,
+            show_lens=False,
+            show_exposure=False,
+            override_model="Z 8 Custom",
+        ))
+        texts_m, _ = renderer.visible_text(masked, self.exiftool, [])
+        self.assertEqual(texts_m[0].strip(), "")
+        self.assertEqual(texts_m[2], "Z 8 Custom")
+        self.assertEqual(texts_m[3], "")
+
+        # Regression: "ZOOM DIGITAL" in KODAK C875 must never trigger "OM DIGITAL" / "OM SYSTEM"
+        self.assertEqual(renderer.canonical_brand("EASTMAN KODAK COMPANY", "KODAK C875 ZOOM DIGITAL CAMERA"), "KODAK")
+        kodak_job = renderer.validate(dict(
+            self.job,
+            metadata={
+                "make": "EASTMAN KODAK COMPANY",
+                "model": "KODAK C875 ZOOM DIGITAL CAMERA",
+                "iso": "80", "aperture": "2.8", "shutter": "1/30",
+                "focal": "7.8", "focal35": "37", "date": "2026:01:11 02:47:03",
+            },
+        ))
+        kodak_texts, kodak_brand = renderer.visible_text(kodak_job, self.exiftool, [])
+        self.assertEqual(kodak_brand, "KODAK")
+        self.assertEqual(kodak_texts[2], "KODAK C875 ZOOM DIGITAL CAMERA")
+
+    def test_overwrite_collision_source_protection_inspect_and_svg_override(self):
+        target = self.folder / "overwrite_me.jpg"
+        target.write_bytes(b"stale content")
+        ow_job = dict(self.job, format="jpg", bit_depth=8, output_path=str(target), collision_mode="overwrite")
+        res = renderer.render(ow_job)
+        self.assertEqual(Path(res["output_path"]), target)
+        self.assertTrue(target.read_bytes().startswith(b"\xff\xd8\xff"))
+
+        # Source photo must never be overwritten even if collision_mode == "overwrite"
+        bad_ow = dict(self.job, source_path=str(target), output_path=str(target), collision_mode="overwrite")
+        with self.assertRaises(ValueError):
+            renderer.validate(bad_ow)
+
+        # CLI --inspect mode (no input_path needed)
+        inspect_res = self.folder / "inspect_out.json"
+        inspect_job = self.folder / "inspect_job.json"
+        inspect_job.write_text(json.dumps({
+            "schema_version": 1,
+            "result_path": str(inspect_res),
+            "logo_mode": "auto_era",
+            "metadata": {"make": "EASTMAN KODAK COMPANY", "model": "KODAK C875 ZOOM DIGITAL CAMERA"},
+        }), encoding="utf-8")
+        self.assertEqual(renderer.main(["--inspect", str(inspect_job)]), 0)
+        ins = json.loads(inspect_res.read_text(encoding="utf-8"))
+        self.assertTrue(ins["ok"])
+        self.assertEqual(ins["brand_info"]["brand_id"], "kodak")
+        self.assertEqual(ins["brand_info"]["era_id"], "2006")
+
+        # Custom SVG user override
+        svg_override = self.folder / "user_badge.svg"
+        svg_override.write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40"><rect width="120" height="40" rx="6" fill="#0077cc"/></svg>', encoding="utf-8")
+        svg_job = dict(self.job, logos={"pentax": str(svg_override)}, output_path=str(self.folder / "svg_override.png"), format="png", bit_depth=8)
+        svg_res = renderer.render(svg_job)
+        self.assertEqual(svg_res["brand_info"]["logo_source"], "user_override")
+        self.assertTrue(Path(svg_res["output_path"]).is_file())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 160" width="460" height="160">
+  <g transform="translate(18,30) scale(0.94)">
+  <path d="M 0 0 L 18.5 0 L 18.5 100 L 0 100 Z M 0 0 L 32 0 A 32 28 0 0 1 32 56 L 0 56 Z M 18.5 17.39 L 18.5 38.61 L 32 38.61 A 13.5 10.61 0 0 0 32 17.39 Z" transform="translate(0,0)" fill="#FF0013" fill-rule="nonzero"/>
+  <path d="M 0 0 L 18.5 0 L 18.5 100 L 0 100 Z M 0 0 L 60 0 L 60 17.39 L 0 17.39 Z M 0 41.3 L 50.4 41.3 L 50.4 58.7 L 0 58.7 Z M 0 82.61 L 60 82.61 L 60 100 L 0 100 Z" transform="translate(70,0)" fill="#FF0013" fill-rule="nonzero"/>
+  <path d="M 0 0 L 17.57 0 L 17.57 100 L 0 100 Z M 52.42 0 L 70 0 L 70 100 L 52.42 100 Z M 0 0 L 19.43 0 L 70 100 L 50.58 100 Z" transform="translate(136,0)" fill="#FF0013" fill-rule="nonzero"/>
+  <path d="M 0 0 L 62 0 L 62 17.39 L 0 17.39 Z M 21.75 0 L 40.25 0 L 40.25 100 L 21.75 100 Z" transform="translate(212,0)" fill="#FF0013" fill-rule="nonzero"/>
+  <path d="M 25.36 0 L 46.64 0 L 72 100 L 52.58 100 L 36 16 L 19.43 100 L 0 100 Z M 15.84 62 L 56.16 62 L 56.16 79.39 L 15.84 79.39 Z" transform="translate(280,0)" fill="#FF0013" fill-rule="nonzero"/>
+  <path d="M 0 0 L 21.27 0 L 68 100 L 46.73 100 Z M 46.73 0 L 68 0 L 21.27 100 L 0 100 Z" transform="translate(358,0)" fill="#FF0013" fill-rule="nonzero"/>
+</g>
+</svg>

@@ -1,116 +1,62 @@
-<div align="center">
-  <h1>Lightroom EXIF Frame</h1>
-  <p>사진 바깥에 촬영 정보와 직접 등록한 카메라 로고를 더하는 Lightroom Classic 플러그인<br />A Lightroom Classic export plug-in for EXIF frames and your registered camera logos.</p>
-  <p><a href="https://github.com/yunhyok/lightroom-exif-frame/releases">Windows 다운로드 · Download</a> · <a href="https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/USER_GUIDE.md">사용 가이드 · Guide</a> · <a href="https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/VALIDATION.md">검증 기록 · Validation</a></p>
-</div>
+# Lightroom EXIF Frame (`v0.2.0`)
 
-<table>
-  <tr><td align="center"><img src="docs/images/strap-light.jpg" alt="Strap light frame example" width="440" /><br /><b>Strap · Light</b></td><td align="center"><img src="docs/images/strap-dark.jpg" alt="Strap dark frame example" width="440" /><br /><b>Strap · Dark</b></td></tr>
-  <tr><td colspan="2" align="center"><img src="docs/images/simple.jpg" alt="Simple frame example" width="660" /><br /><b>Simple</b></td></tr>
-</table>
+Lightroom Classic (Windows x64, SDK 13+)용 **고품질 EXIF 프레임 & 시대별 제조사 CI 로고** 내보내기 플러그인입니다.
 
-예시는 사용자가 제공한 왜가리 사진입니다. 공개 예시는 긴 변을 최대 1600 px로 줄이고 내부 메타데이터를 제거했습니다. 원본 사진과 공식 카메라 로고는 배포하지 않습니다. 예시 사진의 권리는 [별도 표시](docs/images/LICENSE.md)를 따릅니다.<br />
-Examples use the user's supplied heron photograph, reduced to a maximum 1600 px long edge with embedded metadata removed. The original photo and official camera logos are not bundled. Example photographs retain their [separate reserved rights](docs/images/LICENSE.md).
+![Windows checks and package](https://github.com/yunhyok/lightroom-exif-frame/actions/workflows/ci.yml/badge.svg)
 
-## 설치 · Install
+---
 
-Windows x64용 **v0.1.0**입니다. Lightroom **Classic**의 내보내기 플러그인이며, 클라우드 기반 Lightroom에서는 사용할 수 없습니다. SDK API 기준은 13입니다. 실제 확인한 버전과 남은 검증은 [검증 기록](https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/VALIDATION.md)을 참고하세요.
+## 주요 특징 (v0.2.0)
 
-This is **v0.1.0 for Windows x64**, an export plug-in for Lightroom **Classic**. The SDK API baseline is 13. Consult the [validation record](https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/VALIDATION.md) for tested versions and outstanding checks.
+### 1. Lightroom 기본 **내보내기 위치(Export Location)** 및 **파일 이름 지정(File Naming)** 네이티브 연동
+- 내보내기 창 상단에 Lightroom의 기본 **내보내기 위치**(`특정 폴더`, `원본 사진과 동일한 폴더`, `나중에 폴더 선택`, `바탕 화면/사진/문서` 표준 폴더, `하위 폴더에 넣기`, `이 카탈로그에 추가 / 스택`, `기존 파일 처리: 덮어쓰기/새 이름/건너뛰기/묻기`)와 **파일 이름 지정**(토큰 프리셋, 소문자/대문자 확장자) 패널을 그대로 사용합니다.
+- **파일 형식(JPG / PNG 8·16-bit / WebP 무손실·손실), 색공간, 품질** 설정은 하단의 **EXIF Frame — 파일 형식 및 출력 설정** 섹션으로 깔끔하게 분리되어 있습니다.
 
-1. [Releases](https://github.com/yunhyok/lightroom-exif-frame/releases)에서 `Lightroom-EXIF-Frame-0.1.0-Windows-x64.zip`을 내려받아 보관할 폴더에 압축을 풉니다.<br />Download the Windows ZIP and extract it to a permanent folder.
-2. `LightroomExifFrame.lrplugin` 폴더 전체를 유지합니다. `bin` 폴더에는 실행 도구와 필요한 라이브러리가 있습니다.<br />Keep the entire `.lrplugin` folder, including `bin` and its supporting files.
-3. Lightroom Classic → **파일 → 플러그인 관리자 → 추가**에서 이 `.lrplugin` 폴더를 선택합니다.<br />In Lightroom Classic, choose **File → Plug-in Manager → Add** and select the `.lrplugin` folder.
-4. 사진을 선택하고 **파일 → 내보내기**, 내보내기 대상에서 **EXIF Frame**을 선택합니다.<br />Select photos, open **File → Export**, and select **EXIF Frame** as the export destination.
+### 2. 카메라 **출시·생산연도 기반** 순수 벡터 제조사 CI 로고 (61개 브랜드 · 93개 시대 CI)
+- 시스템 글꼴로 흉내 낸 어색한 제조사 이름 대신, **`resvg` 기반 순수 벡터 SVG(`<path>`, `<rect>`, `<circle>` 등)**로 정교하게 제작된 제조사 공식 CI 로고를 합성합니다.
+- 촬영 일시(`DateTimeOriginal`)가 아니라 **카메라·스마트폰·액션캠·드론 기종(`Model`)의 실제 출시/생산연도**에 맞춰 해당 시대의 로고를 자동 선택합니다.
+  - 예: 2026년에 촬영한 `KODAK C875` 사진이라도 카메라가 출시된 2006년 기준 **Kodak 2006–2016 둥근 레드 워드마크**가 표시됩니다.
+  - 모델이 미등록되었거나 신형 기종인 경우 **최신 공식 CI**로 자동 폴백됩니다.
+- 전통 카메라/중형/시네마(Canon, Nikon, Sony / Sony α, Minolta, Konica Minolta, Fujifilm, Olympus, OM System, Panasonic, LUMIX, Pentax, Ricoh, Leica, Sigma, Hasselblad, Kodak, Samsung, Polaroid, Phase One, Mamiya, Contax, Casio, Epson, Kyocera, Yashica, Rollei, ZEISS, Pixii, RED, ARRI, Blackmagic Design), 스마트폰(Apple, Google, Xiaomi, Huawei, OPPO, vivo, OnePlus, LG, GoldStar, Sony Ericsson, Motorola, Nokia, HONOR, realme, NOTHING, ASUS, HTC, SHARP, BlackBerry, Pantech), 액션캠/360/드론(GoPro, DJI, Insta360, RICOH THETA, Garmin, Autel Robotics, Parrot, SJCAM, AKASO) 총 **61개 제조사 · 93개 시대 CI**를 내장합니다.
+- 원하는 경우 브랜드별 **사용자 PNG/SVG 로고 오버라이드**도 플러그인 설정에서 등록·해제할 수 있습니다.
+- 세부 역사·색상표·변천 기준은 [docs/BRAND_LOGO_HISTORY.md](docs/BRAND_LOGO_HISTORY.md)를 참고하세요.
 
-배포 ZIP에는 필요한 실행 도구가 포함됩니다. Python, ImageMagick, ExifTool을 별도로 설치할 필요가 없습니다.<br />
-The release ZIP includes its runtime tools; a separate Python, ImageMagick, or ExifTool installation is unnecessary.
+### 3. 16가지 프레임 테마 및 세밀한 메타데이터/비율 제어 (`exif-frame.yuru.cam` 호환)
+- **16개 테마**: `strap`, `simple`, `one_line`, `two_line`, `shot_on_one_line`, `shot_on_two_line`, `film`, `monitor`, `lightroom`, `just_frame`, `cinemascope`, `poster`, `tip`, `custom_one_line`, `custom_two_line`, `none`
+- **색상/외관**: `Auto`(테마 최적 기본값), `Light`, `Dark`, `Custom (#RRGGBB)` + 다크 배경 자동 CI 명도 보정 + 모노크롬(`mono`) 모드
+- **비율 & 레이아웃**: `Free`(원본 비율) 및 9가지 고정 비율(`1:1`, `4:5`, `5:4`, `3:4`, `4:3`, `2:3`, `3:2`, `16:9`, `9:16`), **자르기 없이 여백 맞추기(`Fit without crop`)**, 사진 내부 오버레이(`Overlay inside photo`), 컴팩트 HUD(`Compact`), 글꼴 스타일(`Normal`/`Italic`), 정렬(`Left`/`Center`/`Right`), 투명도, 그림자
+- **초점거리 & 날짜 표기**: 35mm 환산(`equivalent`), 실제 초점거리(`actual`), 배율 계산(`ratio` × `crop_factor`), **10가지 날짜 표기 형식**(한국어·일본어·영어·ISO 등)
+- **표시 토글 및 직접 지정**: 제조사/바디/렌즈/노출 개별 숨김 및 직접 수정, `{label}`, `{era}` 확장 토큰
 
-## 사용 · Use
+### 4. 16-bit Q16 LCMS 색관리 & 안전한 메타데이터 보존
+- ImageMagick 7 Q16 LCMS로 `sRGB`, `Adobe RGB`, `ProPhoto RGB` 색공간과 **16-bit PNG 무손실 바디 픽셀**을 정확히 유지합니다.
+- ExifTool 13.59로 원본 XMP/IPTC/EXIF 및 얼굴 영역(MWG Region) 좌표를 프레임 오프셋에 맞춰 변환하며, Lightroom의 GPS/인물 정보 제거(`Remove Person Info`) 정책을 존중하고 원본 사진 덮어쓰기를 원천 차단합니다.
 
-1. 플러그인의 출력 폴더와 JPG/PNG/WebP 형식을 선택합니다. JPG/PNG는 색공간, PNG는 8/16비트를 선택할 수 있습니다.<br />Choose the output folder and JPG, PNG, or WebP. Select a color space for JPG/PNG and a bit depth for PNG.
-2. Lightroom의 기본 **파일 이름 지정, 이미지 크기 조정, 출력 선명하게 하기, 메타데이터** 설정을 조정합니다. 크기 조정은 **사진 본체**에 적용되고 프레임은 그 바깥에 추가됩니다.<br />Use Lightroom's native naming, image sizing, output sharpening, and metadata controls. Sizing applies to the **photo body**; the frame increases the final canvas.
-3. **Strap / Simple / None**과 밝게/어둡게/사용자 색상을 선택합니다. 네 텍스트 영역에 원하는 토큰을 넣습니다.<br />Choose **Strap, Simple, or None**, a light/dark/custom appearance, and four text templates.
-4. 필요한 제조사의 공식 투명 PNG 로고를 직접 등록합니다. 등록 경로는 사용자별 Lightroom 플러그인 설정에 저장됩니다.<br />Register your own official transparent PNG logos by manufacturer. Their paths are saved in your per-user plug-in preferences.
-5. **미리보기**로 선택한 사진을 확인한 뒤 내보냅니다. 미리보기는 현재 Lightroom 설정으로 새로 렌더링하므로 시간이 걸릴 수 있습니다.<br />Preview the selected photo, then export. Preview renders it again through Lightroom using the current settings and may take time.
+---
 
-동일한 이름의 파일이 있으면 번호를 붙여 저장합니다. 배치 작업을 취소하면 실행 중인 사진 한 장의 처리를 마친 뒤 다음 사진부터 중단합니다.<br />
-Existing files are preserved by allocating a numbered filename. Batch cancellation finishes the photo currently being processed, then stops before the next one.
+## 설치 및 사용 방법
 
-<details>
-<summary><b>형식과 메타데이터 · Formats and metadata</b></summary>
+1. [Releases](https://github.com/yunhyok/lightroom-exif-frame/releases)에서 최신 `Lightroom-EXIF-Frame-0.2.0-Windows-x64.zip`을 다운로드하고 압축을 풉니다. (SHA-256 체크섬 검증 권장)
+2. Lightroom Classic → **파일(File) → 플러그인 관리자(Plug-in Manager) → 추가(Add)**에서 `LightroomExifFrame.lrplugin` 폴더를 선택합니다.
+3. **내보내기(Export)** 대화상자 최상단의 **내보낼 위치(Export To)**에서 **EXIF Frame**을 선택합니다.
+4. 자세한 사용법과 설정 설명은 [docs/USER_GUIDE.md](docs/USER_GUIDE.md)를 확인하세요.
 
-| 출력 · Output | 비트 · Depth | 색공간 · Color space | 압축 · Compression |
-|---|---|---|---|
-| JPG | 8-bit | sRGB / Adobe RGB / ProPhoto RGB | Quality 1–100 |
-| PNG | 8 / 16-bit | sRGB / Adobe RGB / ProPhoto RGB | Lossless |
-| WebP | 8-bit | sRGB | Quality 1–100 / lossless |
+---
 
-Lightroom에서 선택한 색공간의 **16비트 TIFF와 ICC 프로파일**을 임시 렌더링한 다음 프레임을 합성합니다. WebP는 sRGB로 렌더링합니다. 미리보기는 화면 표시용 sRGB PNG입니다.
-
-Lightroom produces a temporary **16-bit TIFF with the selected ICC profile** before framing. WebP uses sRGB. Preview is an sRGB PNG for display.
-
-최종 파일 내부 메타데이터의 복사 원본은 **Lightroom이 렌더링한 TIFF만** 사용합니다. Lightroom의 메타데이터 제외 및 GPS 제거 설정을 우회해 원본 파일의 태그를 복구하지 않습니다. 프레임에 보이는 텍스트는 별도의 카탈로그 촬영 정보이며, 내부 메타데이터 제외와 독립적입니다.
-
-Embedded metadata is copied **only from Lightroom's rendered TIFF**. The plug-in does not restore original-file tags removed by Lightroom's metadata or GPS settings. Visible frame text uses separate catalog information and is independent of embedded metadata removal.
-
-컨테이너 차이 때문에 모든 태그를 바이트 단위로 동일하게 보존하는 것은 지원하지 않습니다. WebP의 IPTC IIM은 지원되는 XMP 항목으로 변환합니다. 회전·크기는 최종 이미지에 맞추고, 오래된 미리보기와 일부 제조사 전용 정보는 제외합니다. 지원되지 않는 위치 기반 태그는 경고와 함께 생략합니다. 자세한 범위는 [가이드](https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/USER_GUIDE.md#metadata)를 참고하세요.
-
-Container differences prevent byte-for-byte preservation of every tag. WebP maps supported IPTC IIM fields to XMP. Orientation and dimensions are updated; stale previews and some manufacturer-specific data are excluded. Unsupported spatial tags are omitted with warnings. See the [guide](https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/USER_GUIDE.md#metadata).
-
-</details>
-
-<details>
-<summary><b>토큰과 레이아웃 · Tokens and layout</b></summary>
-
-기본 Strap 구성은 왼쪽 촬영 정보/시간, 가운데 로고, 오른쪽 카메라/렌즈입니다. Simple은 사진 주변 여백과 가운데 정렬한 하단 정보를 사용합니다. None은 프레임 없이 선택한 형식으로 내보냅니다.
-
-Strap places exposure/time on the left, a registered logo in the middle, and camera/lens on the right. Simple adds surrounding padding and centered footer text. None exports without a frame.
-
-| 토큰 · Token | 내용 · Value |
-|---|---|
-| `{iso}` / `{aperture}` / `{shutter}` | ISO / 조리개 값 · f-number / 노출 시간 · exposure time |
-| `{focal}` / `{focal35}` | 선택한 초점거리 방식 · selected focal mode / 35 mm equivalent |
-| `{date}` | Lightroom 촬영 일시 · Lightroom capture date/time |
-| `{make}` / `{model}` / `{lens}` | 제조사 / 모델 / 렌즈 · make / model / lens |
-| `{artist}` | 입력한 이름, 비워 두면 카탈로그 아티스트 · entered name, otherwise catalog artist |
-
-예: `ISO{iso} {focal}mm F{aperture} {shutter}s`. 값이 없는 토큰은 `—`로 표시합니다. 글이 길면 줄바꿈하거나 줄이며, 공간에 들어가지 않으면 경고와 함께 생략합니다.
-
-Example: `ISO{iso} {focal}mm F{aperture} {shutter}s`. Missing values display `—`. Long text wraps or shrinks; text that cannot fit is omitted with a warning.
-
-</details>
-
-<details>
-<summary><b>개발 및 빌드 · Development and build</b></summary>
-
-Windows x64에서 Python 3.12를 사용합니다. 고정 버전 의존성과 공급 도구의 출처는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에 기록합니다. 빌드 스크립트는 필요한 공급 도구를 다운로드하고 지정된 SHA-256을 확인합니다.
-
-Build on Windows x64 with Python 3.12. Pinned dependencies and vendor provenance are documented in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The build fetches vendor tools and checks their pinned SHA-256 hashes.
+## 개발 및 로컬 빌드
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\pip.exe install -r requirements-dev.txt
 .\.venv\Scripts\python.exe scripts\fetch_vendor.py
+
+# 전체 단위/통합 테스트 실행
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
+
+# 배포용 Windows x64 플러그인 ZIP + SHA256SUMS 생성
 .\.venv\Scripts\python.exe scripts\build.py
 ```
 
-검사 전에 공급 도구를 가져와야 실제 렌더링·메타데이터 검사가 실행됩니다. 결과는 플러그인과 문서를 포함한 ZIP 및 `dist/SHA256SUMS.txt`입니다.<br />
-Fetch vendor tools before testing so rendering and metadata tests run. Outputs are the ZIP containing the plug-in and documentation, plus `dist/SHA256SUMS.txt`.
-
-Lua 플러그인이 Lightroom 내보내기를 제어하고, 번들 실행 파일이 ImageMagick Q16과 ExifTool로 합성·변환·메타데이터 처리를 수행합니다. 개발자용 요청/응답 계약은 [docs/protocol.md](docs/protocol.md)에 있습니다. Python/Lua 모의 SDK 검사와 실제 Lightroom 검사는 [검증 기록](https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/VALIDATION.md)에서 구분합니다.
-
-Lua controls the Lightroom export; the bundled helper uses ImageMagick Q16 and ExifTool for rendering, conversion, and metadata. The helper contract is in [docs/protocol.md](docs/protocol.md). Automated tests and live Lightroom checks are distinguished in the [validation record](https://github.com/yunhyok/lightroom-exif-frame/blob/main/docs/VALIDATION.md).
-
-</details>
-
-## 라이선스와 참고 · License and references
-
-원본 플러그인/헬퍼 소스는 [MIT](LICENSE)입니다. 이 라이선스는 사진, 사용자 등록 로고, 글꼴에 대한 권리를 부여하지 않습니다. 해당 자료의 이용 조건을 확인하세요. 제조사 로고와 글꼴은 배포하지 않습니다. Adobe 또는 카메라 제조사가 승인한 제품은 아닙니다.
-
-Original plug-in/helper source is [MIT licensed](LICENSE). This license does not grant rights to photographs, registered logos, or fonts. Check their own usage terms. Logos and fonts are not distributed. This independent project is not endorsed by Adobe or camera manufacturers.
-
-- [Adobe Lightroom Classic SDK](https://developer.adobe.com/lightroom-classic/): 내보내기 플러그인 API · export plug-in APIs.
-- [ExifTool WebP/RIFF tags](https://exiftool.org/TagNames/RIFF.html), [PNG tags](https://exiftool.org/TagNames/PNG.html): 형식별 메타데이터 구조 · metadata containers.
-- [ExifTool IPTC-to-XMP mapping](https://github.com/exiftool/exiftool/blob/master/arg_files/iptc2xmp.args): 지원되는 IPTC 변환 · supported IPTC conversion.
+- 헬퍼 CLI 프로토콜 명세: [docs/protocol.md](docs/protocol.md)
+- 제조사 로고 변천사: [docs/BRAND_LOGO_HISTORY.md](docs/BRAND_LOGO_HISTORY.md)
+- 서드파티 라이선스 고지: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)

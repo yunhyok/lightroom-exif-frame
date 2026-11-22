@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <circle cx="90" cy="90" r="80" fill="#E20612"/>
+  <path d="M 56 46 C 46 68 38 92 32 106 C 48 104 64 102 74 100 M 76 86 C 84 82 92 78 90 73 C 86 68 74 75 74 86 C 74 96 86 98 96 92 M 102 73 L 98 95 M 104 58 L 105 60 M 114 62 L 109 95 M 106 72 L 120 71 M 122 74 L 136 74 L 120 95 L 136 95" fill="none" stroke="{{BADGE_FG}}" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 38 112 Q 92 104 146 109" fill="none" stroke="{{BADGE_FG}}" stroke-width="4.2" stroke-linecap="round"/>
+</svg>

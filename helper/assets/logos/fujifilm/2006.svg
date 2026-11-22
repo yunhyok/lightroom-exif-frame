@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 160" width="540" height="160">
+  <g transform="translate(16,36) scale(0.84)">
+  <path d="M 0 0 L 15.5 0 L 15.5 100 L 0 100 Z M 0 0 L 55.68 0 L 55.68 14.57 L 0 14.57 Z M 0 42.72 L 45.66 42.72 L 45.66 57.29 L 0 57.29 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 15.5 0 L 15.5 68 L 0 68 Z M 49.78 0 L 65.28 0 L 65.28 68 L 49.78 68 Z M 65.28 66 A 32.64 34 0 0 1 0 66 L 15.5 66 A 17.14 19.43 0 0 0 49.78 66 Z" transform="translate(63.68,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 36.34 0 L 51.84 0 L 51.84 68 L 36.34 68 Z M 51.84 66 A 26.96 34 0 0 1 -1.48 73.07 L 13.68 70.04 A 11.46 19.43 0 0 0 36.34 66 Z" transform="translate(136.96,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+  <path d="M 183.31 54 L 197.31 46 L 197.31 120 L 183.31 120 Z" fill="{{INK}}"/>
+  <path d="M 183.31 36 L 197.31 36 L 197.31 42 L 183.31 50 Z" fill="#FB0020"/>
+  <g transform="translate(207.31,36) scale(0.84)">
+  <path d="M 0 0 L 15.5 0 L 15.5 100 L 0 100 Z M 0 0 L 55.68 0 L 55.68 14.57 L 0 14.57 Z M 0 42.72 L 45.66 42.72 L 45.66 57.29 L 0 57.29 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 3.19 0 L 18.69 0 L 18.69 100 L 3.19 100 Z" transform="translate(63.68,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 15.5 0 L 15.5 100 L 0 100 Z M 0 85.43 L 53.76 85.43 L 53.76 100 L 0 100 Z" transform="translate(93.57,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 14.72 0 L 14.72 100 L 0 100 Z M 63.99 0 L 78.72 0 L 78.72 100 L 63.99 100 Z M 0 0 L 16.28 0 L 39.36 72 L 62.44 0 L 78.72 0 L 78.72 14 L 46.34 92 L 32.38 92 L 0 14 Z" transform="translate(155.33,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+</svg>

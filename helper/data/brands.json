@@ -1,0 +1,1330 @@
+{
+  "schema_version": 1,
+  "brands": [
+    {
+      "id": "canon",
+      "name": "Canon",
+      "category": "camera",
+      "aliases": ["CANON", "CANON INC."],
+      "eras": [
+        {
+          "id": "1935",
+          "label": "1935–1955 (Early Serif-Hook Wordmark)",
+          "label_ko": "1935–1955 (초기 세리프 훅 워드마크)",
+          "start_year": 1935,
+          "end_year": 1955,
+          "svg": "canon/1935.svg",
+          "accent_color": "#141414"
+        },
+        {
+          "id": "1956",
+          "label": "1956–Present (Classic Canon Red)",
+          "label_ko": "1956–현재 (클래식 Canon 레드)",
+          "start_year": 1956,
+          "end_year": null,
+          "svg": "canon/1956.svg",
+          "accent_color": "#CC0000"
+        }
+      ]
+    },
+    {
+      "id": "nikon",
+      "name": "Nikon",
+      "category": "camera",
+      "aliases": ["NIKON", "NIKON CORPORATION", "NIPPON KOGAKU"],
+      "eras": [
+        {
+          "id": "1968",
+          "label": "1968–1987 (Kamekura Track Oval)",
+          "label_ko": "1968–1987 (카메쿠라 트랙 타원)",
+          "start_year": 1968,
+          "end_year": 1987,
+          "svg": "nikon/1968.svg",
+          "accent_color": "#FFE100"
+        },
+        {
+          "id": "1988",
+          "label": "1988–2002 (Italic Wordmark)",
+          "label_ko": "1988–2002 (이탤릭 워드마크)",
+          "start_year": 1988,
+          "end_year": 2002,
+          "svg": "nikon/1988.svg",
+          "accent_color": "#000000"
+        },
+        {
+          "id": "2003",
+          "label": "2003–Present (Yellow Rays Square)",
+          "label_ko": "2003–현재 (노란 정사각 광선 CI)",
+          "start_year": 2003,
+          "end_year": null,
+          "svg": "nikon/2003.svg",
+          "accent_color": "#FFE100"
+        }
+      ]
+    },
+    {
+      "id": "sony",
+      "name": "Sony",
+      "category": "camera",
+      "aliases": ["SONY", "SONY CORPORATION", "SONY MOBILE"],
+      "eras": [
+        {
+          "id": "1973",
+          "label": "1973–Present (Classic Clarendon Serif)",
+          "label_ko": "1973–현재 (클래식 세리프 SONY)",
+          "start_year": 1973,
+          "end_year": null,
+          "svg": "sony/1973.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "sony-alpha",
+      "name": "Sony α",
+      "category": "camera",
+      "aliases": ["SONY ALPHA"],
+      "eras": [
+        {
+          "id": "2006",
+          "label": "2006–Present (SONY + Alpha α)",
+          "label_ko": "2006–현재 (SONY + α 심볼)",
+          "start_year": 2006,
+          "end_year": null,
+          "svg": "sony-alpha/2006.svg",
+          "accent_color": "#E34234"
+        }
+      ]
+    },
+    {
+      "id": "minolta",
+      "name": "Minolta",
+      "category": "camera",
+      "aliases": ["MINOLTA", "MINOLTA CO., LTD.", "MINOLTA CO.,LTD"],
+      "eras": [
+        {
+          "id": "1981",
+          "label": "1981–2003 (Saul Bass Blue Globe)",
+          "label_ko": "1981–2003 (솔 배스 블루 글로브)",
+          "start_year": 1981,
+          "end_year": null,
+          "svg": "minolta/1981.svg",
+          "accent_color": "#005BAC"
+        }
+      ]
+    },
+    {
+      "id": "konica-minolta",
+      "name": "Konica Minolta",
+      "category": "camera",
+      "aliases": ["KONICA MINOLTA", "KONICA MINOLTA PHOTO IMAGING, INC.", "KONICA MINOLTA CAMERA, INC."],
+      "eras": [
+        {
+          "id": "2003",
+          "label": "2003–2006 (Globe + Wordmark)",
+          "label_ko": "2003–2006 (통합 글로브 CI)",
+          "start_year": 2003,
+          "end_year": null,
+          "svg": "konica-minolta/2003.svg",
+          "accent_color": "#005BAC"
+        }
+      ]
+    },
+    {
+      "id": "fujifilm",
+      "name": "Fujifilm",
+      "category": "camera",
+      "aliases": ["FUJIFILM", "FUJI PHOTO FILM CO., LTD."],
+      "eras": [
+        {
+          "id": "1980",
+          "label": "1980–2006 (Green Film Box CI)",
+          "label_ko": "1980–2006 (그린 필름박스 CI)",
+          "start_year": 1980,
+          "end_year": 2005,
+          "svg": "fujifilm/1980.svg",
+          "accent_color": "#00843D"
+        },
+        {
+          "id": "2006",
+          "label": "2006–Present (Notched-I Wordmark)",
+          "label_ko": "2006–현재 (레드 노치 I 워드마크)",
+          "start_year": 2006,
+          "end_year": null,
+          "svg": "fujifilm/2006.svg",
+          "accent_color": "#FB0020"
+        }
+      ]
+    },
+    {
+      "id": "olympus",
+      "name": "Olympus",
+      "category": "camera",
+      "aliases": ["OLYMPUS", "OLYMPUS OPTICAL CO.,LTD", "OLYMPUS IMAGING CORP.", "OLYMPUS CORPORATION"],
+      "eras": [
+        {
+          "id": "1970",
+          "label": "1970–2000 (Solid Blue Wordmark)",
+          "label_ko": "1970–2000 (단독 블루 워드마크)",
+          "start_year": 1970,
+          "end_year": 2000,
+          "svg": "olympus/1970.svg",
+          "accent_color": "#08107B"
+        },
+        {
+          "id": "2001",
+          "label": "2001–2021 (Opto-Digital Gold Bar)",
+          "label_ko": "2001–2021 (골드 언더라인 CI)",
+          "start_year": 2001,
+          "end_year": null,
+          "svg": "olympus/2001.svg",
+          "accent_color": "#EBB700"
+        }
+      ]
+    },
+    {
+      "id": "om-system",
+      "name": "OM System",
+      "category": "camera",
+      "aliases": ["OM SYSTEM", "OM DIGITAL SOLUTIONS", "OM DIGITAL SOLUTIONS CORPORATION"],
+      "eras": [
+        {
+          "id": "2021",
+          "label": "2021–Present (Stacked Frame Badge)",
+          "label_ko": "2021–현재 (사각 프레임 2단 배지)",
+          "start_year": 2021,
+          "end_year": null,
+          "svg": "om-system/2021.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "panasonic",
+      "name": "Panasonic",
+      "category": "camera",
+      "aliases": ["PANASONIC", "MATSUSHITA"],
+      "eras": [
+        {
+          "id": "1971",
+          "label": "1971–Present (Panasonic Blue Wordmark)",
+          "label_ko": "1971–현재 (파나소닉 블루 워드마크)",
+          "start_year": 1971,
+          "end_year": null,
+          "svg": "panasonic/1971.svg",
+          "accent_color": "#0041C0"
+        }
+      ]
+    },
+    {
+      "id": "lumix",
+      "name": "LUMIX",
+      "category": "camera",
+      "aliases": ["LUMIX"],
+      "eras": [
+        {
+          "id": "2001",
+          "label": "2001–Present (Red L + LUMIX)",
+          "label_ko": "2001–현재 (레드 L 심볼 + LUMIX)",
+          "start_year": 2001,
+          "end_year": null,
+          "svg": "lumix/2001.svg",
+          "accent_color": "#E60012"
+        }
+      ]
+    },
+    {
+      "id": "pentax",
+      "name": "Pentax",
+      "category": "camera",
+      "aliases": ["PENTAX", "PENTAX CORPORATION", "ASAHI OPTICAL CO.,LTD.", "PENTAX RICOH IMAGING"],
+      "eras": [
+        {
+          "id": "1957",
+          "label": "1957–1986 (ASAHI PENTAX)",
+          "label_ko": "1957–1986 (아사히 펜탁스)",
+          "start_year": 1957,
+          "end_year": 1986,
+          "svg": "pentax/1957.svg",
+          "accent_color": "#141414"
+        },
+        {
+          "id": "1987",
+          "label": "1987–Present (Bold PENTAX Red)",
+          "label_ko": "1987–현재 (볼드 PENTAX 레드)",
+          "start_year": 1987,
+          "end_year": null,
+          "svg": "pentax/1987.svg",
+          "accent_color": "#FF0013"
+        }
+      ]
+    },
+    {
+      "id": "ricoh",
+      "name": "Ricoh",
+      "category": "camera",
+      "aliases": ["RICOH", "RICOH COMPANY, LTD.", "RICOH IMAGING COMPANY, LTD."],
+      "eras": [
+        {
+          "id": "1986",
+          "label": "1986–2005 (Outline Block RICOH)",
+          "label_ko": "1986–2005 (아웃라인 블록 RICOH)",
+          "start_year": 1986,
+          "end_year": 2004,
+          "svg": "ricoh/1986.svg",
+          "accent_color": "#D61B3E"
+        },
+        {
+          "id": "2005",
+          "label": "2005–Present (Curved Solid Red RICOH)",
+          "label_ko": "2005–현재 (곡선 솔리드 레드 RICOH)",
+          "start_year": 2005,
+          "end_year": null,
+          "svg": "ricoh/2005.svg",
+          "accent_color": "#D61B3E"
+        }
+      ]
+    },
+    {
+      "id": "leica",
+      "name": "Leica",
+      "category": "camera",
+      "aliases": ["LEICA", "LEICA CAMERA AG", "ERNST LEITZ WETZLAR"],
+      "eras": [
+        {
+          "id": "1976",
+          "label": "1976–1987 (Leitz Red Dot)",
+          "label_ko": "1976–1987 (Leitz 레드 닷)",
+          "start_year": 1976,
+          "end_year": 1985,
+          "svg": "leica/1976.svg",
+          "accent_color": "#E20612"
+        },
+        {
+          "id": "1986",
+          "label": "1986–Present (Leica Script Red Dot)",
+          "label_ko": "1986–현재 (Leica 스크립트 레드 닷)",
+          "start_year": 1986,
+          "end_year": null,
+          "svg": "leica/1986.svg",
+          "accent_color": "#E20612"
+        }
+      ]
+    },
+    {
+      "id": "sigma",
+      "name": "Sigma",
+      "category": "camera",
+      "aliases": ["SIGMA", "SIGMA CORPORATION"],
+      "eras": [
+        {
+          "id": "1961",
+          "label": "1961–2012 (Italic Block SIGMA)",
+          "label_ko": "1961–2012 (이탤릭 블록 SIGMA)",
+          "start_year": 1961,
+          "end_year": 2011,
+          "svg": "sigma/1961.svg",
+          "accent_color": "#000000"
+        },
+        {
+          "id": "2012",
+          "label": "2012–2024 (Global Vision Upright)",
+          "label_ko": "2012–2024 (Global Vision 정직립)",
+          "start_year": 2012,
+          "end_year": 2024,
+          "svg": "sigma/2012.svg",
+          "accent_color": "#000000"
+        },
+        {
+          "id": "2025",
+          "label": "2025–Present (Sigma Serif + Σ Emblem)",
+          "label_ko": "2025–현재 (Sigma Serif + Σ 심볼)",
+          "start_year": 2025,
+          "end_year": null,
+          "svg": "sigma/2025.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "hasselblad",
+      "name": "Hasselblad",
+      "category": "camera",
+      "aliases": ["HASSELBLAD", "VICTOR HASSELBLAD AB"],
+      "eras": [
+        {
+          "id": "1990",
+          "label": "1990–2014 (Heavy H-Square & Wordmark)",
+          "label_ko": "1990–2014 (묵직한 H 사각 CI)",
+          "start_year": 1990,
+          "end_year": 2014,
+          "svg": "hasselblad/1990.svg",
+          "accent_color": "#000000"
+        },
+        {
+          "id": "2015",
+          "label": "2015–Present (Wide-Tracked Minimalist)",
+          "label_ko": "2015–현재 (슬림 와이드트래킹 CI)",
+          "start_year": 2015,
+          "end_year": null,
+          "svg": "hasselblad/2015.svg",
+          "accent_color": "#FF6A00"
+        }
+      ]
+    },
+    {
+      "id": "kodak",
+      "name": "Kodak",
+      "category": "camera",
+      "aliases": ["KODAK", "EASTMAN KODAK COMPANY", "JK IMAGING, LTD."],
+      "eras": [
+        {
+          "id": "1987",
+          "label": "1987–2005 (Classic K-Box)",
+          "label_ko": "1987–2005 (클래식 K-Box)",
+          "start_year": 1987,
+          "end_year": 2005,
+          "svg": "kodak/1987.svg",
+          "accent_color": "#FFB700"
+        },
+        {
+          "id": "2006",
+          "label": "2006–2016 (Rounded Red Wordmark)",
+          "label_ko": "2006–2016 (둥근 레드 워드마크)",
+          "start_year": 2006,
+          "end_year": 2016,
+          "svg": "kodak/2006.svg",
+          "accent_color": "#ED0000"
+        },
+        {
+          "id": "2016",
+          "label": "2016–Present (Restored K-Box Vertical)",
+          "label_ko": "2016–현재 (복원 K-Box 세로 KODAK)",
+          "start_year": 2017,
+          "end_year": null,
+          "svg": "kodak/2016.svg",
+          "accent_color": "#FFB700"
+        }
+      ]
+    },
+    {
+      "id": "samsung",
+      "name": "Samsung",
+      "category": "smartphone",
+      "aliases": ["SAMSUNG", "SAMSUNG TECHWIN", "SAMSUNG ELECTRONICS"],
+      "eras": [
+        {
+          "id": "1993",
+          "label": "1993–2014 (Tilted Blue Ellipse)",
+          "label_ko": "1993–2014 (기울어진 블루 타원)",
+          "start_year": 1993,
+          "end_year": 2014,
+          "svg": "samsung/1993.svg",
+          "accent_color": "#1428A0"
+        },
+        {
+          "id": "2015",
+          "label": "2015–Present (Flat Clean Wordmark)",
+          "label_ko": "2015–현재 (타원 없는 플랫 워드마크)",
+          "start_year": 2015,
+          "end_year": null,
+          "svg": "samsung/2015.svg",
+          "accent_color": "#1428A0"
+        }
+      ]
+    },
+    {
+      "id": "polaroid",
+      "name": "Polaroid",
+      "category": "camera",
+      "aliases": ["POLAROID", "POLAROID ORIGINALS"],
+      "eras": [
+        {
+          "id": "1977",
+          "label": "1977–2016 (Classic 5-Stripe)",
+          "label_ko": "1977–2016 (클래식 5색 스펙트럼)",
+          "start_year": 1977,
+          "end_year": 2016,
+          "svg": "polaroid/1977.svg",
+          "accent_color": "#D60026"
+        },
+        {
+          "id": "2017",
+          "label": "2017–2019 (Polaroid Originals)",
+          "label_ko": "2017–2019 (Polaroid Originals)",
+          "start_year": 2017,
+          "end_year": 2019,
+          "svg": "polaroid/2017.svg",
+          "accent_color": "#00AEEF"
+        },
+        {
+          "id": "2020",
+          "label": "2020–Present (Unified Spectrum)",
+          "label_ko": "2020–현재 (통합 스펙트럼 복원)",
+          "start_year": 2020,
+          "end_year": null,
+          "svg": "polaroid/2020.svg",
+          "accent_color": "#00AEEF"
+        }
+      ]
+    },
+    {
+      "id": "phase-one",
+      "name": "Phase One",
+      "category": "camera",
+      "aliases": ["PHASE ONE", "PHASE ONE A/S"],
+      "eras": [
+        {
+          "id": "1993",
+          "label": "1993–Present (Minimalist Sans)",
+          "label_ko": "1993–현재 (미니멀 산세리프)",
+          "start_year": 1993,
+          "end_year": null,
+          "svg": "phase-one/1993.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "mamiya",
+      "name": "Mamiya",
+      "category": "camera",
+      "aliases": ["MAMIYA", "MAMIYA-OP CO.,LTD.", "MAMIYA DIGITAL IMAGING"],
+      "eras": [
+        {
+          "id": "1940",
+          "label": "1940–Present (Classic Mamiya)",
+          "label_ko": "1940–현재 (클래식 마미야)",
+          "start_year": 1940,
+          "end_year": null,
+          "svg": "mamiya/1940.svg",
+          "accent_color": "#FC001B"
+        }
+      ]
+    },
+    {
+      "id": "contax",
+      "name": "Contax",
+      "category": "camera",
+      "aliases": ["CONTAX"],
+      "eras": [
+        {
+          "id": "1974",
+          "label": "1974–2005 (Porsche Design Tracked Sans)",
+          "label_ko": "1974–2005 (포르쉐 디자인 와이드 산세리프)",
+          "start_year": 1974,
+          "end_year": null,
+          "svg": "contax/1974.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "casio",
+      "name": "Casio",
+      "category": "camera",
+      "aliases": ["CASIO", "CASIO COMPUTER CO.,LTD."],
+      "eras": [
+        {
+          "id": "1972",
+          "label": "1972–Present (Bold Geometric CASIO)",
+          "label_ko": "1972–현재 (기하학 볼드 CASIO)",
+          "start_year": 1972,
+          "end_year": null,
+          "svg": "casio/1972.svg",
+          "accent_color": "#0055CC"
+        }
+      ]
+    },
+    {
+      "id": "epson",
+      "name": "Epson",
+      "category": "camera",
+      "aliases": ["EPSON", "SEIKO EPSON CORP.", "SEIKO EPSON"],
+      "eras": [
+        {
+          "id": "1994",
+          "label": "1994–Present (Corporate Blue EPSON)",
+          "label_ko": "1994–현재 (코퍼레이트 블루 EPSON)",
+          "start_year": 1994,
+          "end_year": null,
+          "svg": "epson/1994.svg",
+          "accent_color": "#003399"
+        }
+      ]
+    },
+    {
+      "id": "kyocera",
+      "name": "Kyocera",
+      "category": "camera",
+      "aliases": ["KYOCERA", "KYOCERA CORPORATION"],
+      "eras": [
+        {
+          "id": "1982",
+          "label": "1982–Present (KC Mark + KYOCERA)",
+          "label_ko": "1982–현재 (KC 마크 + KYOCERA)",
+          "start_year": 1982,
+          "end_year": null,
+          "svg": "kyocera/1982.svg",
+          "accent_color": "#E31A2F"
+        }
+      ]
+    },
+    {
+      "id": "yashica",
+      "name": "Yashica",
+      "category": "camera",
+      "aliases": ["YASHICA"],
+      "eras": [
+        {
+          "id": "1983",
+          "label": "1983–Present (Industrial Block YASHICA)",
+          "label_ko": "1983–현재 (인더스트리얼 블록 YASHICA)",
+          "start_year": 1983,
+          "end_year": null,
+          "svg": "yashica/1983.svg",
+          "accent_color": "#111111"
+        }
+      ]
+    },
+    {
+      "id": "rollei",
+      "name": "Rollei",
+      "category": "camera",
+      "aliases": ["ROLLEI", "FRANKE & HEIDECKE"],
+      "eras": [
+        {
+          "id": "1962",
+          "label": "1962–Present (Bold Geometric Rollei)",
+          "label_ko": "1962–현재 (볼드 기하학 Rollei)",
+          "start_year": 1962,
+          "end_year": null,
+          "svg": "rollei/1962.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "zeiss",
+      "name": "ZEISS",
+      "category": "camera",
+      "aliases": ["ZEISS", "CARL ZEISS"],
+      "eras": [
+        {
+          "id": "1991",
+          "label": "1991–Present (Blue Tessar Frame)",
+          "label_ko": "1991–현재 (블루 테사 프레임 ZEISS)",
+          "start_year": 1991,
+          "end_year": null,
+          "svg": "zeiss/1991.svg",
+          "accent_color": "#0F2DB3"
+        }
+      ]
+    },
+    {
+      "id": "pixii",
+      "name": "Pixii",
+      "category": "camera",
+      "aliases": ["PIXII", "PIXII SAS"],
+      "eras": [
+        {
+          "id": "2017",
+          "label": "2017–Present (Besancon Minimalist)",
+          "label_ko": "2017–현재 (미니멀 기하학 PIXII)",
+          "start_year": 2017,
+          "end_year": null,
+          "svg": "pixii/2017.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "red",
+      "name": "RED",
+      "category": "camera",
+      "aliases": ["RED", "RED DIGITAL CINEMA"],
+      "eras": [
+        {
+          "id": "2005",
+          "label": "2005–Present (RED Digital Cinema)",
+          "label_ko": "2005–현재 (RED 시네마 배지)",
+          "start_year": 2005,
+          "end_year": null,
+          "svg": "red/2005.svg",
+          "accent_color": "#DC2026"
+        }
+      ]
+    },
+    {
+      "id": "arri",
+      "name": "ARRI",
+      "category": "camera",
+      "aliases": ["ARRI", "ARNOLD & RICHTER"],
+      "eras": [
+        {
+          "id": "2010",
+          "label": "2010–Present (ARRI Blue Engineering)",
+          "label_ko": "2010–현재 (ARRI 블루 시네마 CI)",
+          "start_year": 2010,
+          "end_year": null,
+          "svg": "arri/2010.svg",
+          "accent_color": "#005BA6"
+        }
+      ]
+    },
+    {
+      "id": "blackmagic",
+      "name": "Blackmagic Design",
+      "category": "camera",
+      "aliases": ["BLACKMAGIC", "BLACKMAGIC DESIGN"],
+      "eras": [
+        {
+          "id": "2001",
+          "label": "2001–Present (Blackmagic Badge)",
+          "label_ko": "2001–현재 (Blackmagic 배지)",
+          "start_year": 2001,
+          "end_year": null,
+          "svg": "blackmagic/2001.svg",
+          "accent_color": "#FFA200"
+        }
+      ]
+    },
+    {
+      "id": "apple",
+      "name": "Apple",
+      "category": "smartphone",
+      "aliases": ["APPLE", "APPLE INC."],
+      "eras": [
+        {
+          "id": "1977",
+          "label": "1977–1997 (Six-Color Rainbow Apple)",
+          "label_ko": "1977–1997 (6색 무지개 사과)",
+          "start_year": 1977,
+          "end_year": 1997,
+          "svg": "apple/1977.svg",
+          "accent_color": "#61BB46"
+        },
+        {
+          "id": "2007",
+          "label": "2007–2012 (Chrome / Glass 3D Apple)",
+          "label_ko": "2007–2012 (크롬 글래스 입체 사과)",
+          "start_year": 2007,
+          "end_year": 2012,
+          "svg": "apple/2007.svg",
+          "accent_color": "#A3AAAE"
+        },
+        {
+          "id": "2013",
+          "label": "2013–Present (Flat Minimalist Apple)",
+          "label_ko": "2013–현재 (플랫 미니멀 사과)",
+          "start_year": 2013,
+          "end_year": null,
+          "svg": "apple/2013.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "google",
+      "name": "Google",
+      "category": "smartphone",
+      "aliases": ["GOOGLE", "GOOGLE LLC"],
+      "eras": [
+        {
+          "id": "2010",
+          "label": "2010–2014 (Catull Serif Google)",
+          "label_ko": "2010–2014 (Catull 세리프 Google)",
+          "start_year": 2010,
+          "end_year": 2014,
+          "svg": "google/2010.svg",
+          "accent_color": "#4285F4"
+        },
+        {
+          "id": "2015",
+          "label": "2015–Present (Product Sans + 4-Color G)",
+          "label_ko": "2015–현재 (Product Sans + 4색 G)",
+          "start_year": 2015,
+          "end_year": null,
+          "svg": "google/2015.svg",
+          "accent_color": "#4285F4"
+        }
+      ]
+    },
+    {
+      "id": "xiaomi",
+      "name": "Xiaomi",
+      "category": "smartphone",
+      "aliases": ["XIAOMI", "XIAOMI COMMUNICATIONS", "REDMI", "POCO"],
+      "eras": [
+        {
+          "id": "2014",
+          "label": "2014–2020 (Sharp Orange MI Box)",
+          "label_ko": "2014–2020 (직각 라운드 오렌지 MI)",
+          "start_year": 2014,
+          "end_year": 2020,
+          "svg": "xiaomi/2014.svg",
+          "accent_color": "#FF6700"
+        },
+        {
+          "id": "2021",
+          "label": "2021–Present (Kenya Hara Squircle MI)",
+          "label_ko": "2021–현재 (하라 켄야 초타원 Squircle MI)",
+          "start_year": 2021,
+          "end_year": null,
+          "svg": "xiaomi/2021.svg",
+          "accent_color": "#FF6700"
+        }
+      ]
+    },
+    {
+      "id": "huawei",
+      "name": "Huawei",
+      "category": "smartphone",
+      "aliases": ["HUAWEI", "HUAWEI TECHNOLOGIES"],
+      "eras": [
+        {
+          "id": "2006",
+          "label": "2006–2017 (3D Gradient 8-Petals)",
+          "label_ko": "2006–2017 (3D 그라데이션 8꽃잎)",
+          "start_year": 2006,
+          "end_year": 2017,
+          "svg": "huawei/2006.svg",
+          "accent_color": "#E60012"
+        },
+        {
+          "id": "2018",
+          "label": "2018–Present (Flat Red 8-Petals)",
+          "label_ko": "2018–현재 (플랫 레드 8꽃잎)",
+          "start_year": 2018,
+          "end_year": null,
+          "svg": "huawei/2018.svg",
+          "accent_color": "#CF0A2C"
+        }
+      ]
+    },
+    {
+      "id": "oppo",
+      "name": "OPPO",
+      "category": "smartphone",
+      "aliases": ["OPPO", "GUANGDONG OPPO"],
+      "eras": [
+        {
+          "id": "2013",
+          "label": "2013–2018 (Wide Rounded Green)",
+          "label_ko": "2013–2018 (넓은 라운드 그린 oppo)",
+          "start_year": 2013,
+          "end_year": 2018,
+          "svg": "oppo/2013.svg",
+          "accent_color": "#1EA366"
+        },
+        {
+          "id": "2019",
+          "label": "2019–Present (Pentagram Geometric)",
+          "label_ko": "2019–현재 (펜타그램 기하학 oppo)",
+          "start_year": 2019,
+          "end_year": null,
+          "svg": "oppo/2019.svg",
+          "accent_color": "#2D683D"
+        }
+      ]
+    },
+    {
+      "id": "vivo",
+      "name": "vivo",
+      "category": "smartphone",
+      "aliases": ["VIVO", "VIVO MOBILE"],
+      "eras": [
+        {
+          "id": "2009",
+          "label": "2009–2018 (Rounded Blue vivo)",
+          "label_ko": "2009–2018 (둥근 블루 vivo)",
+          "start_year": 2009,
+          "end_year": 2018,
+          "svg": "vivo/2009.svg",
+          "accent_color": "#0072B8"
+        },
+        {
+          "id": "2019",
+          "label": "2019–Present (Sharp Geometric #415FFF)",
+          "label_ko": "2019–현재 (샤프 기하학 비비드 블루)",
+          "start_year": 2019,
+          "end_year": null,
+          "svg": "vivo/2019.svg",
+          "accent_color": "#415FFF"
+        }
+      ]
+    },
+    {
+      "id": "oneplus",
+      "name": "OnePlus",
+      "category": "smartphone",
+      "aliases": ["ONEPLUS", "ONEPLUS TECHNOLOGY"],
+      "eras": [
+        {
+          "id": "2013",
+          "label": "2013–2019 (Sharp 1+ & Condensed)",
+          "label_ko": "2013–2019 (직각 1+ & 좁은 ONEPLUS)",
+          "start_year": 2013,
+          "end_year": 2019,
+          "svg": "oneplus/2013.svg",
+          "accent_color": "#EB0029"
+        },
+        {
+          "id": "2020",
+          "label": "2020–Present (Refined 1+ & Wide)",
+          "label_ko": "2020–현재 (곡선 1+ & 넓은 ONEPLUS)",
+          "start_year": 2020,
+          "end_year": null,
+          "svg": "oneplus/2020.svg",
+          "accent_color": "#F50514"
+        }
+      ]
+    },
+    {
+      "id": "lg",
+      "name": "LG",
+      "category": "smartphone",
+      "aliases": ["LG", "LGE", "LG ELECTRONICS"],
+      "eras": [
+        {
+          "id": "1995",
+          "label": "1995–2013 (3D Glossy Magenta LG)",
+          "label_ko": "1995–2013 (3D 광택 마젠타 LG)",
+          "start_year": 1995,
+          "end_year": 2013,
+          "svg": "lg/1995.svg",
+          "accent_color": "#A50034"
+        },
+        {
+          "id": "2014",
+          "label": "2014–2022 (Flat Heritage Magenta LG)",
+          "label_ko": "2014–2022 (플랫 헤리티지 마젠타 LG)",
+          "start_year": 2014,
+          "end_year": 2022,
+          "svg": "lg/2014.svg",
+          "accent_color": "#A50034"
+        },
+        {
+          "id": "2023",
+          "label": "2023–Present (Active Red LG)",
+          "label_ko": "2023–현재 (액티브 레드 LG)",
+          "start_year": 2023,
+          "end_year": null,
+          "svg": "lg/2023.svg",
+          "accent_color": "#FD312E"
+        }
+      ]
+    },
+    {
+      "id": "goldstar",
+      "name": "GoldStar",
+      "category": "smartphone",
+      "aliases": ["GOLDSTAR", "LUCKY-GOLDSTAR"],
+      "eras": [
+        {
+          "id": "1983",
+          "label": "1983–1995 (Lucky-GoldStar Emblem)",
+          "label_ko": "1983–1995 (금성사 럭키금성 심볼)",
+          "start_year": 1983,
+          "end_year": null,
+          "svg": "goldstar/1983.svg",
+          "accent_color": "#C8102E"
+        }
+      ]
+    },
+    {
+      "id": "sony-ericsson",
+      "name": "Sony Ericsson",
+      "category": "smartphone",
+      "aliases": ["SONY ERICSSON", "SONY ERICSSON MOBILE"],
+      "eras": [
+        {
+          "id": "2001",
+          "label": "2001–2012 (Liquid Energy Orb)",
+          "label_ko": "2001–2012 (리퀴드 에너지 오브)",
+          "start_year": 2001,
+          "end_year": null,
+          "svg": "sony-ericsson/2001.svg",
+          "accent_color": "#00A651"
+        }
+      ]
+    },
+    {
+      "id": "motorola",
+      "name": "Motorola",
+      "category": "smartphone",
+      "aliases": ["MOTOROLA", "MOTOROLA MOBILITY"],
+      "eras": [
+        {
+          "id": "1955",
+          "label": "1955–2012 (Batwing + Italic MOTOROLA)",
+          "label_ko": "1955–2012 (Batwing + 이탤릭 MOTOROLA)",
+          "start_year": 1955,
+          "end_year": 2012,
+          "svg": "motorola/1955.svg",
+          "accent_color": "#005FBE"
+        },
+        {
+          "id": "2013",
+          "label": "2013–Present (Circle M + Lowercase)",
+          "label_ko": "2013–현재 (원형 M + 소문자 motorola)",
+          "start_year": 2013,
+          "end_year": null,
+          "svg": "motorola/2013.svg",
+          "accent_color": "#5C92FA"
+        }
+      ]
+    },
+    {
+      "id": "nokia",
+      "name": "Nokia",
+      "category": "smartphone",
+      "aliases": ["NOKIA", "HMD GLOBAL", "MICROSOFT MOBILE"],
+      "eras": [
+        {
+          "id": "1992",
+          "label": "1992–2022 (Classic Bold Blue NOKIA)",
+          "label_ko": "1992–2022 (클래식 볼드 블루 NOKIA)",
+          "start_year": 1992,
+          "end_year": 2022,
+          "svg": "nokia/1992.svg",
+          "accent_color": "#124191"
+        },
+        {
+          "id": "2023",
+          "label": "2023–Present (Segmented Modern NOKIA)",
+          "label_ko": "2023–현재 (분절 모던 NOKIA)",
+          "start_year": 2023,
+          "end_year": null,
+          "svg": "nokia/2023.svg",
+          "accent_color": "#005AFF"
+        }
+      ]
+    },
+    {
+      "id": "honor",
+      "name": "HONOR",
+      "category": "smartphone",
+      "aliases": ["HONOR"],
+      "eras": [
+        {
+          "id": "2013",
+          "label": "2013–2017 (Lowercase honor)",
+          "label_ko": "2013–2017 (소문자 honor)",
+          "start_year": 2013,
+          "end_year": 2017,
+          "svg": "honor/2013.svg",
+          "accent_color": "#00AEEF"
+        },
+        {
+          "id": "2018",
+          "label": "2018–Present (Uppercase HONOR)",
+          "label_ko": "2018–현재 (대문자 HONOR)",
+          "start_year": 2018,
+          "end_year": null,
+          "svg": "honor/2018.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "realme",
+      "name": "realme",
+      "category": "smartphone",
+      "aliases": ["REALME"],
+      "eras": [
+        {
+          "id": "2018",
+          "label": "2018–Present (Pentagram realme)",
+          "label_ko": "2018–현재 (펜타그램 realme)",
+          "start_year": 2018,
+          "end_year": null,
+          "svg": "realme/2018.svg",
+          "accent_color": "#FFC916"
+        }
+      ]
+    },
+    {
+      "id": "nothing",
+      "name": "NOTHING",
+      "category": "smartphone",
+      "aliases": ["NOTHING", "NOTHING TECHNOLOGY"],
+      "eras": [
+        {
+          "id": "2020",
+          "label": "2020–Present (NDot Matrix NOTHING)",
+          "label_ko": "2020–현재 (도트 매트릭스 NOTHING)",
+          "start_year": 2020,
+          "end_year": null,
+          "svg": "nothing/2020.svg",
+          "accent_color": "#D71921"
+        }
+      ]
+    },
+    {
+      "id": "asus",
+      "name": "ASUS",
+      "category": "smartphone",
+      "aliases": ["ASUS", "ASUSTEK"],
+      "eras": [
+        {
+          "id": "1995",
+          "label": "1995–Present (Sliced Geometric ASUS)",
+          "label_ko": "1995–현재 (수평 절개선 ASUS)",
+          "start_year": 1995,
+          "end_year": null,
+          "svg": "asus/1995.svg",
+          "accent_color": "#00539B"
+        }
+      ]
+    },
+    {
+      "id": "htc",
+      "name": "HTC",
+      "category": "smartphone",
+      "aliases": ["HTC", "HTC CORPORATION"],
+      "eras": [
+        {
+          "id": "2008",
+          "label": "2008–Present (Rounded Green htc)",
+          "label_ko": "2008–현재 (라운드 그린 htc)",
+          "start_year": 2008,
+          "end_year": null,
+          "svg": "htc/2008.svg",
+          "accent_color": "#339933"
+        }
+      ]
+    },
+    {
+      "id": "sharp",
+      "name": "SHARP",
+      "category": "smartphone",
+      "aliases": ["SHARP", "SHARP CORPORATION"],
+      "eras": [
+        {
+          "id": "1960",
+          "label": "1960s–Present (Bold Red SHARP)",
+          "label_ko": "1960s–현재 (볼드 레드 SHARP)",
+          "start_year": 1960,
+          "end_year": null,
+          "svg": "sharp/1960.svg",
+          "accent_color": "#E6000D"
+        }
+      ]
+    },
+    {
+      "id": "blackberry",
+      "name": "BlackBerry",
+      "category": "smartphone",
+      "aliases": ["BLACKBERRY", "RIM", "RESEARCH IN MOTION"],
+      "eras": [
+        {
+          "id": "2004",
+          "label": "2004–Present (7-Dot Berry + Wordmark)",
+          "label_ko": "2004–현재 (7도트 베리 + 워드마크)",
+          "start_year": 2004,
+          "end_year": null,
+          "svg": "blackberry/2004.svg",
+          "accent_color": "#1475DC"
+        }
+      ]
+    },
+    {
+      "id": "pantech",
+      "name": "Pantech",
+      "category": "smartphone",
+      "aliases": ["PANTECH", "SKY", "SK TELETECH"],
+      "eras": [
+        {
+          "id": "2005",
+          "label": "2005–Present (Pantech Blue Block)",
+          "label_ko": "2005–현재 (팬택 블루 블록)",
+          "start_year": 2005,
+          "end_year": null,
+          "svg": "pantech/2005.svg",
+          "accent_color": "#005BAC"
+        }
+      ]
+    },
+    {
+      "id": "gopro",
+      "name": "GoPro",
+      "category": "action_drone",
+      "aliases": ["GOPRO"],
+      "eras": [
+        {
+          "id": "2004",
+          "label": "2004–2011 (Early Bold GoPro)",
+          "label_ko": "2004–2011 (초기 볼드 GoPro)",
+          "start_year": 2004,
+          "end_year": 2011,
+          "svg": "gopro/2004.svg",
+          "accent_color": "#000000"
+        },
+        {
+          "id": "2012",
+          "label": "2012–Present (GoPro + 4 Blue Squares)",
+          "label_ko": "2012–현재 (GoPro + 4색 블루 사각)",
+          "start_year": 2012,
+          "end_year": null,
+          "svg": "gopro/2012.svg",
+          "accent_color": "#00AEEF"
+        }
+      ]
+    },
+    {
+      "id": "dji",
+      "name": "DJI",
+      "category": "action_drone",
+      "aliases": ["DJI", "SZ DJI", "DA-JIANG"],
+      "eras": [
+        {
+          "id": "2006",
+          "label": "2006–2011 (Early Engineering DJI)",
+          "label_ko": "2006–2011 (초기 공학 DJI)",
+          "start_year": 2006,
+          "end_year": 2011,
+          "svg": "dji/2006.svg",
+          "accent_color": "#0971CE"
+        },
+        {
+          "id": "2012",
+          "label": "2012–Present (Iconic Heavy Slanted DJI)",
+          "label_ko": "2012–현재 (중량 사선 컷 DJI)",
+          "start_year": 2012,
+          "end_year": null,
+          "svg": "dji/2012.svg",
+          "accent_color": "#0971CE"
+        }
+      ]
+    },
+    {
+      "id": "insta360",
+      "name": "Insta360",
+      "category": "action_drone",
+      "aliases": ["INSTA360", "ARASHI VISION"],
+      "eras": [
+        {
+          "id": "2015",
+          "label": "2015–2019 (Early Lens Swirl + Insta360)",
+          "label_ko": "2015–2019 (초기 렌즈 심볼 + Insta360)",
+          "start_year": 2015,
+          "end_year": 2019,
+          "svg": "insta360/2015.svg",
+          "accent_color": "#0072CE"
+        },
+        {
+          "id": "2020",
+          "label": "2020–Present (Think Bold Minimalist)",
+          "label_ko": "2020–현재 (Think Bold 옐로우 포인트)",
+          "start_year": 2020,
+          "end_year": null,
+          "svg": "insta360/2020.svg",
+          "accent_color": "#FFDE00"
+        }
+      ]
+    },
+    {
+      "id": "ricoh-theta",
+      "name": "RICOH THETA",
+      "category": "action_drone",
+      "aliases": ["RICOH THETA"],
+      "eras": [
+        {
+          "id": "2013",
+          "label": "2013–Present (RICOH THETA)",
+          "label_ko": "2013–현재 (RICOH THETA)",
+          "start_year": 2013,
+          "end_year": null,
+          "svg": "ricoh-theta/2013.svg",
+          "accent_color": "#D61B3E"
+        }
+      ]
+    },
+    {
+      "id": "garmin",
+      "name": "Garmin",
+      "category": "action_drone",
+      "aliases": ["GARMIN", "GARMIN INTERNATIONAL"],
+      "eras": [
+        {
+          "id": "2006",
+          "label": "2006–Present (GARMIN + Blue Delta)",
+          "label_ko": "2006–현재 (GARMIN + 블루 델타)",
+          "start_year": 2006,
+          "end_year": null,
+          "svg": "garmin/2006.svg",
+          "accent_color": "#007CC3"
+        }
+      ]
+    },
+    {
+      "id": "autel",
+      "name": "Autel Robotics",
+      "category": "action_drone",
+      "aliases": ["AUTEL", "AUTEL ROBOTICS"],
+      "eras": [
+        {
+          "id": "2014",
+          "label": "2014–Present (Autel Orange A-Mark)",
+          "label_ko": "2014–현재 (Autel 오렌지 심볼)",
+          "start_year": 2014,
+          "end_year": null,
+          "svg": "autel/2014.svg",
+          "accent_color": "#FF7F00"
+        }
+      ]
+    },
+    {
+      "id": "parrot",
+      "name": "Parrot",
+      "category": "action_drone",
+      "aliases": ["PARROT", "PARROT DRONES"],
+      "eras": [
+        {
+          "id": "1994",
+          "label": "1994–Present (Minimalist Parrot)",
+          "label_ko": "1994–현재 (미니멀 Parrot)",
+          "start_year": 1994,
+          "end_year": null,
+          "svg": "parrot/1994.svg",
+          "accent_color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "sjcam",
+      "name": "SJCAM",
+      "category": "action_drone",
+      "aliases": ["SJCAM"],
+      "eras": [
+        {
+          "id": "2010",
+          "label": "2010–Present (Monza Red Italic SJCAM)",
+          "label_ko": "2010–현재 (몬자 레드 이탤릭 SJCAM)",
+          "start_year": 2010,
+          "end_year": null,
+          "svg": "sjcam/2010.svg",
+          "accent_color": "#E30613"
+        }
+      ]
+    },
+    {
+      "id": "akaso",
+      "name": "AKASO",
+      "category": "action_drone",
+      "aliases": ["AKASO"],
+      "eras": [
+        {
+          "id": "2013",
+          "label": "2013–Present (Geometric AKASO)",
+          "label_ko": "2013–현재 (기하학 AKASO)",
+          "start_year": 2013,
+          "end_year": null,
+          "svg": "akaso/2013.svg",
+          "accent_color": "#FF5500"
+        }
+      ]
+    }
+  ]
+}

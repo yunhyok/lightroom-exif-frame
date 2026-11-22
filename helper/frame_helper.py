@@ -1,4 +1,4 @@
-"""Lightroom TIFF16 frame renderer. Runtime dependencies: ImageMagick Q16, ExifTool."""
+"""Lightroom TIFF16 frame renderer and brand/era inspector. Runtime dependencies: ImageMagick Q16, ExifTool, resvg."""
 from __future__ import annotations
 
 import argparse
@@ -10,30 +10,47 @@ import re
 import subprocess
 import sys
 import tempfile
+from typing import Any
 
+import formatting
+import logos
 import metadata
+import themes
 
+SCHEMA_VERSION = 1
 ROOT = Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[1]
-DEFAULT_TEMPLATES = ["ISO{iso} {focal}mm F{aperture} {shutter}s", "{date}", "{make} {model}", "{lens}"]
-FIELDS = {"make", "model", "lens", "iso", "aperture", "shutter", "focal", "focal35", "date", "artist"}
+DEFAULT_TEMPLATES = [
+    "ISO{iso} {focal}mm F{aperture} {shutter}s",
+    "{date}",
+    "{make} {model}",
+    "{lens}",
+]
+FIELDS = formatting.FIELDS
 
 
 def run(executable: Path, arguments: list[str], *, binary: bool = False) -> str | bytes:
+    """Run bundled ImageMagick or ExifTool safely without shell expansion."""
+    args = [str(a) for a in arguments]
     if executable.stem.lower().startswith("exiftool"):
-        result = metadata.run_exiftool(executable, *map(str, arguments), binary=binary)
+        result = metadata.run_exiftool(executable, *args, binary=binary)
         return result.stdout if binary else result.stdout.strip()
-    if executable.stem.lower() == "magick" and arguments != ["-version"]:
+    if executable.stem.lower() == "magick" and args != ["-version"]:
         limits = ["-limit", "memory", "512MiB", "-limit", "map", "1GiB", "-limit", "disk", "2GiB", "-limit", "time", "120"]
-        arguments = ([arguments[0], *limits, *arguments[1:]] if arguments and arguments[0] == "identify"
-                     else [*limits, *arguments])
-    result = subprocess.run([str(executable), *map(str, arguments)], shell=False, capture_output=True,
-                            timeout=180, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        args = ([args[0], *limits, *args[1:]] if args and args[0] == "identify" else [*limits, *args])
+    result = subprocess.run(
+        [str(executable), *args],
+        shell=False,
+        capture_output=True,
+        timeout=180,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+    )
     if result.returncode:
         raise ValueError(result.stderr.decode("utf-8", "replace").strip()[:2000] or "External tool failed")
     return result.stdout if binary else result.stdout.decode("utf-8", "replace").strip()
 
 
-def absolute_path(value, name: str, *, exists: bool = False) -> Path:
+def absolute_path(value: object, name: str, *, exists: bool = False) -> Path:
+    """Validate and resolve an absolute file path."""
     if not isinstance(value, str) or not value or "\x00" in value:
         raise ValueError(f"{name} must be an absolute path")
     path = Path(value)
@@ -46,79 +63,159 @@ def absolute_path(value, name: str, *, exists: bool = False) -> Path:
 
 
 def tool(name: str, relative: str) -> Path:
-    return absolute_path(os.environ.get(name, str(ROOT / relative)), name, exists=True)
+    """Resolve an external tool executable from environment override or plugin bundle."""
+    override = os.environ.get(name)
+    if override is not None:
+        return absolute_path(override, name, exists=True)
+    candidates = [ROOT / relative, ROOT / "vendor" / relative]
+    if not getattr(sys, "frozen", False):
+        candidates = [ROOT / "vendor" / relative, ROOT / relative]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate.resolve()
+    return absolute_path(str(candidates[0]), name, exists=True)
 
 
-def number(job: dict, name: str, default, low, high) -> float:
+def number(job: dict[str, Any], name: str, default: float, low: float, high: float) -> float:
+    """Validate a finite numeric field within [low, high]."""
     value = job.get(name, default)
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not low <= value <= high:
         raise ValueError(f"{name} must be between {low} and {high}")
+    return float(value)
+
+
+def _bool_opt(job: dict[str, Any], name: str, default: bool) -> bool:
+    value = job.get(name, default)
+    if not isinstance(value, bool):
+        raise ValueError(f"{name} must be boolean")
     return value
 
 
-def validate(job: dict) -> dict:
-    if not isinstance(job, dict) or job.get("schema_version") != 1:
+def _str_opt(job: dict[str, Any], name: str, default: str, max_len: int = 256) -> str:
+    value = job.get(name, default)
+    if not isinstance(value, str) or len(value) > max_len or "\x00" in value:
+        raise ValueError(f"{name} must be a string of at most {max_len} characters")
+    return value
+
+
+def _allowed_opt(job: dict[str, Any], name: str, allowed: set[str] | tuple[str, ...], default: str) -> str:
+    value = job.get(name, default)
+    if not isinstance(value, str) or value not in allowed:
+        raise ValueError(f"Invalid {name}")
+    return value
+
+
+def validate(job: object, *, inspect_only: bool = False) -> dict[str, Any]:
+    """Validate and normalize a JSON render or inspect job."""
+    if not isinstance(job, dict) or job.get("schema_version") != SCHEMA_VERSION:
         raise ValueError("Unsupported job schema")
     result = dict(job)
-    for key in ("input_path", "output_path", "result_path"):
-        result[key] = absolute_path(job.get(key), key, exists=key == "input_path")
-    if not result["output_path"].parent.is_dir() or not result["result_path"].parent.is_dir():
+    result["collision_mode"] = _allowed_opt(job, "collision_mode", ("rename", "overwrite", "skip", "ask"), "rename")
+    result["result_path"] = absolute_path(job.get("result_path"), "result_path")
+    if not result["result_path"].parent.is_dir():
         raise ValueError("Output and result directories must exist")
-    if len({result[key] for key in ("input_path", "output_path", "result_path")}) != 3:
-        raise ValueError("Input, output, and result paths must differ")
+
+    if inspect_only:
+        result["input_path"] = absolute_path(job["input_path"], "input_path", exists=True) if job.get("input_path") else None
+        result["output_path"] = absolute_path(job["output_path"], "output_path") if job.get("output_path") else None
+    else:
+        for key in ("input_path", "output_path"):
+            result[key] = absolute_path(job.get(key), key, exists=key == "input_path")
+        if not result["output_path"].parent.is_dir():
+            raise ValueError("Output and result directories must exist")
+        if len({result["input_path"], result["output_path"], result["result_path"]}) != 3:
+            raise ValueError("Input, output, and result paths must differ")
+        with result["input_path"].open("rb") as stream:
+            if stream.read(4) not in (b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+"):
+                raise ValueError("Input must be a Lightroom-rendered TIFF")
+
     if job.get("source_path"):
         result["source_path"] = absolute_path(job["source_path"], "source_path", exists=True)
         if result["source_path"] == result["result_path"]:
             raise ValueError("Source path must differ from result path")
-    with result["input_path"].open("rb") as stream:
-        if stream.read(4) not in (b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+"):
-            raise ValueError("Input must be a Lightroom-rendered TIFF")
-    for name, default, choices in (("format", "jpg", {"jpg", "png", "webp"}),
-                                    ("theme", "strap", {"strap", "simple", "none"}),
-                                    ("appearance", "light", {"light", "dark", "custom"}),
-                                    ("color_space", "sRGB", {"sRGB", "AdobeRGB", "ProPhotoRGB"}),
-                                    ("focal_mode", "equivalent", {"equivalent", "actual"})):
+        if result["collision_mode"] == "overwrite" and result.get("output_path") and result["source_path"] == result["output_path"]:
+            raise ValueError("Source path must differ from output path when overwriting")
+    else:
+        result["source_path"] = None
+
+    for name, default, choices in (
+        ("format", "jpg", {"jpg", "png", "webp"}),
+        ("theme", "strap", themes.THEMES),
+        ("appearance", "light", {"auto", "light", "dark", "custom"}),
+        ("color_space", "sRGB", {"sRGB", "AdobeRGB", "ProPhotoRGB"}),
+        ("focal_mode", "equivalent", {"equivalent", "actual", "ratio"}),
+    ):
         result[name] = job.get(name, default)
         if result[name] not in choices:
             raise ValueError(f"Invalid {name}")
+
     for name in ("preview", "lossless", "remove_person_info"):
-        result[name] = job.get(name, False)
-        if not isinstance(result[name], bool):
-            raise ValueError(f"{name} must be boolean")
+        result[name] = _bool_opt(job, name, False)
+
     result["bit_depth"] = job.get("bit_depth", 8)
     if type(result["bit_depth"]) is not int or result["bit_depth"] not in (8, 16):
         raise ValueError("bit_depth must be 8 or 16")
     if result["format"] != "png" and result["bit_depth"] != 8:
-        raise ValueError("Only PNG supports 16-bit output")
+        raise ValueError("Only PNG supports 16-bit depth")
     if result["format"] == "webp" and result["color_space"] != "sRGB":
-        raise ValueError("WebP output requires sRGB")
-    suffixes = {"jpg": {".jpg", ".jpeg"}, "png": {".png"}, "webp": {".webp"}}
-    if result["output_path"].suffix.lower() not in ({".png"} if result["preview"] else suffixes[result["format"]]):
-        raise ValueError("Output extension does not match format")
-    for name, default, low, high in (("quality", 95, 1, 100), ("preview_max_size", 1200, 64, 4096),
-                                    ("font_percent", 1.65, .2, 10), ("band_percent", 7.3, 1, 40),
-                                    ("padding_percent", 1.7, 0, 20), ("logo_percent", 10, 1, 50)):
-        result[name] = number(job, name, default, low, high)
+        raise ValueError("WebP requires sRGB")
+
+    result["quality"] = round(number(job, "quality", 95, 1, 100))
+    result["preview_max_size"] = round(number(job, "preview_max_size", 600, 64, 4096))
+    result["font_percent"] = number(job, "font_percent", 1.65, 0.2, 10)
+    result["band_percent"] = number(job, "band_percent", 7.3, 1, 40)
+    result["padding_percent"] = number(job, "padding_percent", 1.7, 0, 20)
+    result["logo_percent"] = number(job, "logo_percent", 10.0, 1, 50)
+    result["crop_factor"] = number(job, "crop_factor", 1.0, 0.1, 20.0)
+
+    # v0.2.0 layout, typography, logo CI, and metadata controls
+    result["aspect_ratio"] = _allowed_opt(job, "aspect_ratio", themes.ASPECT_RATIOS, "free")
+    result["no_crop"] = _bool_opt(job, "no_crop", False)
+    result["padding_inside"] = _bool_opt(job, "padding_inside", False)
+    result["text_alpha"] = number(job, "text_alpha", 1.0, 0.05, 1.0)
+    result["shadow_size"] = number(job, "shadow_size", 0.0, 0.0, 50.0)
+    result["text_align"] = _allowed_opt(job, "text_align", ("left", "center", "right"), "center")
+    result["font_style"] = _allowed_opt(job, "font_style", ("normal", "italic"), "normal")
+    result["compact"] = _bool_opt(job, "compact", False)
+    result["logo_mode"] = _allowed_opt(job, "logo_mode", ("auto_era", "auto_latest", "manual_era", "text_only", "none"), "auto_era")
+    result["logo_style"] = _allowed_opt(job, "logo_style", ("brand", "mono"), "brand")
+    result["manual_brand"] = _str_opt(job, "manual_brand", "", 128)
+    result["manual_era"] = _str_opt(job, "manual_era", "", 128)
+    result["show_make"] = _bool_opt(job, "show_make", True)
+    result["show_model"] = _bool_opt(job, "show_model", True)
+    result["show_lens"] = _bool_opt(job, "show_lens", True)
+    result["show_exposure"] = _bool_opt(job, "show_exposure", True)
+    result["override_make"] = _str_opt(job, "override_make", "", 256)
+    result["override_model"] = _str_opt(job, "override_model", "", 256)
+    result["override_lens"] = _str_opt(job, "override_lens", "", 256)
+    result["label"] = _str_opt(job, "label", "", 256)
+    result["divider"] = _str_opt(job, "divider", "∙", 16)
+    result["date_notation"] = _allowed_opt(job, "date_notation", formatting.DATE_NOTATIONS, "slash_datetime")
+
     for name, default in (("background_color", "#ffffff"), ("text_color", "#161616"), ("secondary_color", "#555555")):
         result[name] = job.get(name, default)
         if not isinstance(result[name], str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", result[name]):
             raise ValueError(f"{name} must be #RRGGBB")
     if result["appearance"] != "custom":
-        result.update(zip(("background_color", "text_color", "secondary_color"),
-                          ("#ffffff", "#161616", "#555555") if result["appearance"] == "light" else ("#171717", "#f4f4f4", "#bbbbbb")))
+        bg, fg, sec, _ = themes.resolve_theme_colors(result)
+        result["background_color"] = bg
+        result["text_color"] = fg
+        result["secondary_color"] = sec
+
     templates = job.get("templates", DEFAULT_TEMPLATES)
     if not isinstance(templates, list) or len(templates) != 4 or any(not isinstance(t, str) or len(t) > 2048 or "\x00" in t for t in templates):
         raise ValueError("templates must contain four strings of at most 2048 characters")
     result["templates"] = templates
+
     data = job.get("metadata", {})
     if not isinstance(data, dict) or any(not isinstance(v, (str, int, float)) or isinstance(v, bool) or len(str(v)) > 2048 or "\x00" in str(v) for v in data.values()):
         raise ValueError("metadata must contain short string or numeric values")
     result["metadata"] = {key: str(value).strip() for key, value in data.items() if key in FIELDS}
-    if not isinstance(job.get("artist", ""), str) or len(job.get("artist", "")) > 2048 or "\x00" in job.get("artist", ""):
-        raise ValueError("artist must be a short string")
-    result["artist"] = job.get("artist", "")
+
+    result["artist"] = _str_opt(job, "artist", "", 2048)
+
     if not isinstance(job.get("logos", {}), dict):
-        raise ValueError("logos must be a brand-to-PNG-path object")
+        raise ValueError("logos must be a brand-to-logo-path object")
     result["logos"] = {}
     for brand, value in job.get("logos", {}).items():
         if not isinstance(brand, str):
@@ -128,60 +225,63 @@ def validate(job: dict) -> dict:
             if path in (result["input_path"], result["output_path"], result["result_path"]):
                 raise ValueError("Logo must differ from input/output/result")
             result["logos"][brand.lower()] = path
+
     font_default = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts/malgun.ttf"
-    result["font_path"] = absolute_path(job.get("font_path", str(font_default)), "font_path", exists=result["theme"] != "none")
+    if inspect_only:
+        result["font_path"] = absolute_path(job.get("font_path", str(font_default)), "font_path") if job.get("font_path") else font_default
+    else:
+        need_font = result["theme"] not in ("none", "just_frame", "cinemascope")
+        result["font_path"] = absolute_path(job.get("font_path", str(font_default)), "font_path", exists=need_font)
     return result
 
 
 def canonical_brand(make: str, model: str) -> str:
-    text = f"{make} {model}".upper()
-    if "PENTAX" in model.upper() or "PENTAX" in make.upper():
-        return "PENTAX"
-    for brand in ("RICOH", "CANON", "NIKON", "SONY", "FUJIFILM", "PANASONIC", "OLYMPUS", "LEICA", "SIGMA", "HASSELBLAD"):
-        if brand in text:
-            return brand
-    if "OM DIGITAL" in text or "OM SYSTEM" in text:
-        return "OM SYSTEM"
-    return make.strip()
+    """Return canonical camera manufacturer name for text display and presets."""
+    return formatting.canonical_brand(make, model)
 
 
-def visible_text(job: dict, exiftool: Path, warnings: list[str]) -> tuple[list[str], str]:
-    values = dict(job["metadata"])
-    needed = FIELDS - {"artist"}
-    if job["focal_mode"] == "actual":
-        needed -= {"focal35"}
-    if job.get("source_path") and any(not values.get(key) for key in needed):
+def _resolve_raw_make_model(job: dict[str, Any], exiftool: Path, warnings: list[str]) -> tuple[str, str]:
+    """Obtain unstripped raw Make and Model before display overrides or hiding."""
+    meta = job.get("metadata", {})
+    raw_make = str(meta.get("make", "") or "").strip()
+    raw_model = str(meta.get("model", "") or "").strip()
+    if (not raw_make or not raw_model) and job.get("source_path"):
         try:
-            for key, value in metadata.read_display_metadata(job["source_path"], exiftool).items():
-                if key in FIELDS and not values.get(key):
-                    values[key] = value
+            disk = metadata.read_display_metadata(job["source_path"], exiftool)
+            raw_make = raw_make or str(disk.get("make", "") or "").strip()
+            raw_model = raw_model or str(disk.get("model", "") or "").strip()
         except Exception as error:
             warnings.append(f"Visible metadata fallback failed: {error}")
-    brand = canonical_brand(values.get("make", ""), values.get("model", ""))
-    values["make"] = brand
-    if values.get("model", "").upper().startswith(brand.upper() + " ") and brand:
-        values["model"] = values["model"][len(brand):].lstrip()
-    focal = values.get("focal35") if job["focal_mode"] == "equivalent" else values.get("focal")
-    if not focal and job["focal_mode"] == "equivalent":
-        focal = values.get("focal", "")
-        if focal:
-            warnings.append("35mm-equivalent focal length unavailable; using actual focal length")
-    values["focal"] = re.sub(r"\s*mm$", "", str(focal), flags=re.IGNORECASE) if focal else "—"
-    values["artist"] = job["artist"] or values.get("artist", "")
-    values["date"] = re.sub(r"^(\d{4}):(\d{2}):(\d{2})", r"\1/\2/\3", values.get("date", ""))
-    def replace(match):
-        return str(values.get(match.group(1), "") or "—") if match.group(1) in FIELDS else match.group(0)
-    return [re.sub(r"\{([a-zA-Z0-9_]+)\}", replace, template) for template in job["templates"]], brand
+    return raw_make, raw_model
+
+
+def visible_text(job: dict[str, Any], exiftool: Path, warnings: list[str], *, era_label: str = "") -> tuple[list[str], str]:
+    """Resolve formatted display values and expand the 4 template strings."""
+    values, brand = formatting.resolve_display_values(job, exiftool, warnings, era_label=era_label)
+    texts = formatting.expand_templates(
+        job["templates"],
+        values,
+        show_make=job.get("show_make", True),
+        show_model=job.get("show_model", True),
+        show_lens=job.get("show_lens", True),
+        show_exposure=job.get("show_exposure", True),
+    )
+    return texts, brand
 
 
 def image_info(magick: Path, image: str) -> tuple[int, int, int, str, str]:
+    """Query image dimensions, bit depth, profile list, and ICC description via ImageMagick."""
     info = run(magick, ["identify", "-ping", "-quiet", "-format", "%w|%h|%z|%[profiles]|%[icc:description]", image]).split("|", 4)
     return int(info[0]), int(info[1]), int(info[2]), info[3], info[4]
 
 
 def srgb_profile(magick: Path) -> Path:
-    candidates = [magick.parent / "sRGB.icc", magick.parent / "sRGB.icm",
-                  Path(os.environ.get("WINDIR", "C:/Windows")) / "System32/spool/drivers/color/sRGB Color Space Profile.icm"]
+    """Locate and verify an sRGB ICC profile on disk."""
+    candidates = [
+        magick.parent / "sRGB.icc",
+        magick.parent / "sRGB.icm",
+        Path(os.environ.get("WINDIR", "C:/Windows")) / "System32/spool/drivers/color/sRGB Color Space Profile.icm",
+    ]
     for candidate in candidates:
         if candidate.is_file():
             # Reading this tiny synthetic image verifies that this is actually an sRGB ICC.
@@ -191,7 +291,25 @@ def srgb_profile(magick: Path) -> Path:
     raise ValueError("A verified sRGB ICC profile is required for frame colors and previews")
 
 
-def publish(stage: Path, requested: Path) -> Path:
+def publish(
+    stage: Path,
+    requested: Path,
+    *,
+    overwrite: bool = False,
+    source_path: Path | None = None,
+) -> Path:
+    """Move staged output into its destination safely without clobbering source images."""
+    if overwrite:
+        if source_path is not None:
+            try:
+                if requested.resolve() == source_path.resolve():
+                    raise ValueError("Refusing to overwrite original source photo")
+            except OSError:
+                if str(requested).lower() == str(source_path).lower():
+                    raise ValueError("Refusing to overwrite original source photo")
+        os.replace(stage, requested)
+        return requested
+
     for index in range(10000):
         destination = requested if index == 0 else requested.with_name(f"{requested.stem}_{index}{requested.suffix}")
         try:
@@ -207,7 +325,8 @@ def publish(stage: Path, requested: Path) -> Path:
     raise ValueError("Unable to allocate output filename")
 
 
-def atomic_json(path: Path, data: dict) -> None:
+def atomic_json(path: Path, data: dict[str, Any]) -> None:
+    """Atomically write JSON to path inside its parent directory."""
     handle, name = tempfile.mkstemp(prefix=".exif-frame-result-", suffix=".json", dir=path.parent)
     temporary = Path(name)
     try:
@@ -220,7 +339,33 @@ def atomic_json(path: Path, data: dict) -> None:
         temporary.unlink(missing_ok=True)
 
 
-def render(raw_job: dict) -> dict:
+def inspect(raw_job: dict[str, Any]) -> dict[str, Any]:
+    """Fast brand, era, and CI SVG detection for Lightroom Preview/UI feedback."""
+    job = validate(raw_job, inspect_only=True)
+    warnings: list[str] = []
+    exiftool = tool("EXIF_FRAME_EXIFTOOL", "exiftool/exiftool.exe")
+    raw_make, raw_model = _resolve_raw_make_model(job, exiftool, warnings)
+    _, _, _, is_dark = themes.resolve_theme_colors(job)
+    resolution = logos.resolve_logo(
+        raw_make,
+        raw_model,
+        logo_mode=job["logo_mode"],
+        logo_style=job["logo_style"],
+        manual_brand=job["manual_brand"],
+        manual_era=job["manual_era"],
+        user_logos=job["logos"],
+        is_dark=is_dark,
+    )
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "ok": True,
+        "brand_info": resolution.to_dict(),
+        "warnings": warnings,
+    }
+
+
+def render(raw_job: dict[str, Any]) -> dict[str, Any]:
+    """Render framed image in 16-bit LCMS color-managed pipeline and copy metadata."""
     job = validate(raw_job)
     warnings: list[str] = []
     magick = tool("EXIF_FRAME_MAGICK", "imagemagick/magick.exe")
@@ -228,6 +373,7 @@ def render(raw_job: dict) -> dict:
     version = run(magick, ["-version"])
     if not re.search(r"ImageMagick 7.*\bQ16\b", version) or "lcms" not in version.lower():
         raise ValueError("ImageMagick 7 Q16 with LCMS is required")
+
     source = "TIFF:" + str(job["input_path"]) + "[0]"
     body_width, body_height, depth, profiles, description = image_info(magick, source)
     if depth != 16 or "icc" not in profiles.lower():
@@ -239,147 +385,182 @@ def render(raw_job: dict) -> dict:
         raise ValueError("Image exceeds supported dimensions (32768 per side / 100 megapixels)")
     if job["format"] == "webp" and not job["preview"] and (body_width > 16383 or body_height > 16383):
         raise ValueError("WebP dimensions cannot exceed 16383 pixels")
-    band = max(1, round(body_width * job["band_percent"] / 100)) if job["theme"] != "none" else 0
-    padding = max(0, round(body_width * job["padding_percent"] / 100))
-    offset_x = offset_y = padding if job["theme"] == "simple" else 0
-    width, height = body_width + 2 * offset_x, body_height + band + 2 * offset_y
-    footer_y = offset_y + body_height
+
+    bg_color, text_color, secondary_color, is_dark = themes.resolve_theme_colors(job)
+    eff_w, eff_h, crop_spec, pad_to_ratio = themes.prepare_body_transform(
+        body_width, body_height, job["aspect_ratio"], job["no_crop"], job["theme"]
+    )
+    width, height, offset_x, offset_y, band, padding = themes.compute_canvas_geometry(job, eff_w, eff_h)
+
     if max(width, height) > 32768 or width * height > 100_000_000 or (job["format"] == "webp" and not job["preview"] and max(width, height) > 16383):
         raise ValueError("Framed image exceeds output dimension limits")
+
+    pad_x = ((eff_w - body_width) // 2) if pad_to_ratio else 0
+    pad_y = ((eff_h - body_height) // 2) if pad_to_ratio else 0
+
+    raw_make, raw_model = _resolve_raw_make_model(job, exiftool, warnings)
+    resolution = logos.resolve_logo(
+        raw_make,
+        raw_model,
+        logo_mode=job["logo_mode"],
+        logo_style=job["logo_style"],
+        manual_brand=job["manual_brand"],
+        manual_era=job["manual_era"],
+        user_logos=job["logos"],
+        is_dark=is_dark,
+    )
+
     with tempfile.TemporaryDirectory(prefix=".exif-frame-", dir=job["output_path"].parent) as temporary:
         work = Path(temporary)
         profile = work / "body.icc"
         run(magick, [source, "ICC:" + str(profile)])
         srgb = profile if job["color_space"] == "sRGB" else srgb_profile(magick)
-        args = [source, "+profile", "*", "-profile", str(profile), "+repage"]
-        if band:
-            args = ["-size", f"{width}x{height}", "xc:" + job["background_color"], "-profile", str(srgb), "-profile", str(profile),
-                    "(", *args, ")", "-gravity", "NorthWest", "-compose", "Copy", "-geometry", f"+{offset_x}+{offset_y}", "-composite"]
-            texts, brand = visible_text(job, exiftool, warnings)
-            vertical = min(padding, max(1, round(band * .16)))
-            fontsize = max(6, round(body_width * job["font_percent"] / 100))
 
-            def colored_layer(prefix: list[str], path: Path) -> None:
-                run(magick, [*prefix, "-profile", str(srgb), "-profile", str(profile), "+profile", "!icc,*", "-depth", "16", str(path)])
+        body_args = [source, "+profile", "*", "-profile", str(profile), "+repage"]
+        if crop_spec:
+            body_args.extend(["-crop", crop_spec, "+repage"])
 
-            def text_layer(text: str, slot: tuple[int, int, int, int], index: int, color: str, centered=False, nominal=None) -> None:
-                if not text.strip():
-                    return
-                x, y, available_width, available_height = slot
-                if available_width < 1 or available_height < 1:
-                    warnings.append(f"Text area {index + 1} has no space")
-                    return
-                textfile, layer = work / f"text-{index}.utf8", work / f"text-{index}.miff"
-                textfile.write_text(text, encoding="utf-8")
-                point = nominal or fontsize
-                for attempt in range(8):
-                    settings = ["-background", "none", "-fill", color, "-font", str(job["font_path"]), "-density", "72", "-pointsize", str(point),
-                                "-gravity", "Center" if centered else "NorthWest"]
-                    colored_layer([*settings, "label:@" + str(textfile)], layer)
-                    tw, th, *_ = image_info(magick, str(layer))
-                    if tw > available_width:
-                        colored_layer([*settings, "-size", f"{available_width}x", "caption:@" + str(textfile)], layer)
-                        tw, th, *_ = image_info(magick, str(layer))
-                    if tw <= available_width and th <= available_height:
-                        break
-                    smaller = max(4, min(point - 1, int(point * min(available_width / tw, available_height / th) * .95)))
-                    if smaller >= point:
-                        warnings.append(f"Text area {index + 1} omitted: cannot fit without overlap")
-                        return
-                    point = smaller
-                else:
-                    warnings.append(f"Text area {index + 1} omitted: cannot fit without overlap")
-                    return
-                if centered:
-                    x += (available_width - tw) // 2
-                y += (available_height - th) // 2
-                args.extend(["(", str(layer), ")", "-compose", "Over", "-gravity", "NorthWest", "-geometry", f"+{x}+{y}", "-composite"])
+        need_canvas = (
+            width != (eff_w if crop_spec else body_width)
+            or height != (eff_h if crop_spec else body_height)
+            or offset_x != 0
+            or offset_y != 0
+            or pad_to_ratio
+        )
+        if need_canvas:
+            args = [
+                "-size", f"{width}x{height}", "xc:" + bg_color,
+                "-profile", str(srgb), "-profile", str(profile),
+                "(", *body_args, ")",
+                "-gravity", "NorthWest",
+                "-compose", "Copy",
+                "-geometry", f"+{offset_x + pad_x}+{offset_y + pad_y}",
+                "-composite",
+            ]
+        else:
+            args = body_args
 
-            if job["theme"] == "simple":
-                text_layer("\n".join(t for t in texts if t.strip()), (padding, footer_y + vertical, width - 2 * padding, band - 2 * vertical), 0, job["text_color"], True)
-            else:
-                gap, line_width = max(1, round(body_width * .015)), max(1, round(body_width / 1920))
-                usable = max(1, width - 2 * padding)
-                right_width = max(1, round(usable * .43))
-                desired_logo = max(1, round(body_width * job["logo_percent"] / 100))
-                logo_width = max(1, min(desired_logo, usable - right_width - 3 * gap - line_width - max(1, round(usable * .15))))
-                if logo_width < desired_logo:
-                    warnings.append("Logo area reduced to retain space for metadata")
-                left_width = max(1, usable - right_width - logo_width - 3 * gap - line_width)
-                logo_x = padding + left_width + gap
-                separator = logo_x + logo_width + gap
-                right_edge = separator + line_width + gap
-                row = max(1, (band - 2 * vertical) // 2)
-                for index, text in enumerate(texts):
-                    x = padding if index < 2 else right_edge
-                    slotwidth = left_width if index < 2 else width - padding - right_edge
-                    text_layer(text, (x, footer_y + vertical + (index % 2) * row, slotwidth, row), index,
-                               job["text_color"] if index % 2 == 0 else job["secondary_color"])
-                line = work / "separator.miff"
-                colored_layer(["-size", f"{line_width}x{max(1, band - 2 * vertical)}", "xc:" + job["secondary_color"]], line)
-                args.extend(["(", str(line), ")", "-compose", "Over", "-geometry", f"+{separator}+{footer_y + vertical}", "-composite"])
-                logo = job["logos"].get(brand.lower().replace(" ", "-"))
-                if logo:
-                    if not logo.is_file() or logo.stat().st_size > 32 * 1024 * 1024:
-                        raise ValueError("Logo must be an existing PNG smaller than 32 MiB")
-                    with logo.open("rb") as stream:
-                        if stream.read(8) != b"\x89PNG\r\n\x1a\n":
-                            raise ValueError("Logo must be a PNG image")
-                    logo_source = "PNG:" + str(logo) + "[0]"
-                    lw, lh, _, logo_profiles, _ = image_info(magick, logo_source)
-                    if lw > 32768 or lh > 32768 or lw * lh > 32_000_000:
-                        raise ValueError("Logo exceeds supported dimensions")
-                    boxwidth = logo_width
-                    boxheight = max(1, band - 2 * vertical)
-                    rendered_logo = work / "logo.miff"
-                    logo_args = [logo_source]
-                    if "icc" not in logo_profiles.lower():
-                        logo_args.extend(["-profile", str(srgb)])
-                        warnings.append("Untagged logo assumed sRGB")
-                    run(magick, [*logo_args, "-profile", str(profile), "+profile", "!icc,*", "-resize", f"{boxwidth}x{boxheight}", "-depth", "16", str(rendered_logo)])
-                    lw, lh, *_ = image_info(magick, str(rendered_logo))
-                    x = logo_x + (logo_width - lw) // 2
-                    y = footer_y + (band - lh) // 2
-                    args.extend(["(", str(rendered_logo), ")", "-compose", "Over", "-geometry", f"+{x}+{y}", "-composite"])
-                elif brand:
-                    brand_font = max(fontsize, min(round(band * .6), round(body_width * job["logo_percent"] / 100 * .3)))
-                    text_layer(brand, (logo_x, footer_y + vertical, logo_width, band - 2 * vertical), 4, job["text_color"], True, brand_font)
+        if job["theme"] not in ("none", "just_frame", "cinemascope"):
+            values, brand = formatting.resolve_display_values(job, exiftool, warnings, era_label=resolution.era_label)
+            texts = formatting.expand_templates(
+                job["templates"],
+                values,
+                show_make=job["show_make"],
+                show_model=job["show_model"],
+                show_lens=job.get("show_lens", True),
+                show_exposure=job["show_exposure"],
+            )
+            layer_args = themes.build_theme_layers(
+                job=job,
+                canvas_w=width,
+                canvas_h=height,
+                eff_w=eff_w,
+                eff_h=eff_h,
+                offset_x=offset_x,
+                offset_y=offset_y,
+                band=band,
+                padding=padding,
+                bg_color=bg_color,
+                text_color=text_color,
+                secondary_color=secondary_color,
+                is_dark=is_dark,
+                texts=texts,
+                values=values,
+                brand=brand,
+                resolution=resolution,
+                work=work,
+                profile=profile,
+                srgb=srgb,
+                run_fn=run,
+                image_info_fn=image_info,
+                magick=magick,
+                warnings=warnings,
+            )
+            args.extend(layer_args)
+
         fmt = "png" if job["preview"] else job["format"]
         outdepth = 8 if job["preview"] else job["bit_depth"]
         if job["preview"]:
             args.extend(["-profile", str(srgb), "-resize", f"{int(job['preview_max_size'])}x{int(job['preview_max_size'])}>"])
         args.extend(["-strip", "-alpha", "off", "-depth", str(outdepth)])
         if fmt == "png":
-            args.extend(["-define", f"png:bit-depth={outdepth}", "-define", "png:color-type=2", "-define", "png:exclude-chunk=sRGB,gAMA,cHRM,date,tEXt,zTXt,iTXt,eXIf"])
+            args.extend([
+                "-define", f"png:bit-depth={outdepth}",
+                "-define", "png:color-type=2",
+                "-define", "png:exclude-chunk=sRGB,gAMA,cHRM,date,tEXt,zTXt,iTXt,eXIf",
+            ])
         elif fmt == "jpg":
             args.extend(["-sampling-factor", "4:4:4", "-quality", str(int(job["quality"]))])
         else:
-            args.extend(["-quality", "100" if job["lossless"] else str(int(job["quality"])), "-define", "webp:lossless=" + str(job["lossless"]).lower()])
+            args.extend([
+                "-quality", "100" if job["lossless"] else str(int(job["quality"])),
+                "-define", "webp:lossless=" + str(job["lossless"]).lower(),
+            ])
+
         stage = work / f"rendered.{fmt}"
-        run(magick, ["-limit", "memory", "512MiB", "-limit", "map", "1GiB", "-limit", "disk", "2GiB", "-limit", "time", "120", *args, str(stage)])
+        run(magick, [*args, str(stage)])
         # -strip removes PNG ICC chunks too; reattach only the verified destination profile,
         # without another pixel conversion or restoring any original metadata.
-        run(exiftool, ["-config", "", "-charset", "filename=UTF8", "-overwrite_original",
-                       "-ICC_Profile<=" + str(srgb if job["preview"] else profile), str(stage)])
+        run(exiftool, [
+            "-config", "", "-charset", "filename=UTF8", "-overwrite_original",
+            "-ICC_Profile<=" + str(srgb if job["preview"] else profile), str(stage),
+        ])
         final_width, final_height, _, _, _ = image_info(magick, str(stage))
         embedded = run(exiftool, ["-config", "", "-b", "-ICC_Profile", str(stage)], binary=True)
         if embedded != (srgb if job["preview"] else profile).read_bytes():
             raise ValueError("Renderer lost or changed destination ICC profile")
+
         if not job["preview"]:
-            warnings.extend(metadata.copy_metadata(job["input_path"], stage, exiftool=exiftool, format=fmt,
-                            width=final_width, height=final_height, body_width=body_width, body_height=body_height,
-                            offset_x=offset_x, offset_y=offset_y, remove_person_info=job["remove_person_info"]))
-        output = publish(stage, job["output_path"])
-    return {"schema_version": 1, "ok": True, "output_path": str(output), "width": final_width, "height": final_height, "warnings": warnings}
+            meta_bw = body_width if pad_to_ratio else eff_w
+            meta_bh = body_height if pad_to_ratio else eff_h
+            meta_ox = offset_x + pad_x
+            meta_oy = offset_y + pad_y
+            warnings.extend(
+                metadata.copy_metadata(
+                    job["input_path"],
+                    stage,
+                    exiftool=exiftool,
+                    format=fmt,
+                    width=final_width,
+                    height=final_height,
+                    body_width=meta_bw,
+                    body_height=meta_bh,
+                    offset_x=meta_ox,
+                    offset_y=meta_oy,
+                    remove_person_info=job["remove_person_info"],
+                )
+            )
+
+        output = publish(
+            stage,
+            job["output_path"],
+            overwrite=(not job["preview"] and job["collision_mode"] == "overwrite"),
+            source_path=job.get("source_path"),
+        )
+
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "ok": True,
+        "output_path": str(output),
+        "width": final_width,
+        "height": final_height,
+        "warnings": warnings,
+        "brand_info": resolution.to_dict(),
+    }
 
 
-def main(argv=None) -> int:
+def main(argv: list[str] | None = None) -> int:
+    """CLI entry point supporting --job and --inspect."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--job", required=True)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--job")
+    group.add_argument("--inspect")
     arguments = parser.parse_args(argv)
-    result_path = None
+    mode = "inspect" if arguments.inspect else "job"
+    raw_arg = arguments.inspect or arguments.job
+    result_path: Path | None = None
     try:
-        job_path = absolute_path(arguments.job, "job", exists=True)
+        job_path = absolute_path(raw_arg, "job", exists=True)
         if job_path.stat().st_size > 1024 * 1024:
             raise ValueError("Job exceeds 1 MiB")
         job = json.loads(job_path.read_text(encoding="utf-8-sig"))
@@ -394,9 +575,9 @@ def main(argv=None) -> int:
         if result_path in protected:
             result_path = None
             raise ValueError("Result path cannot overwrite job, source, input, font, logo, or output")
-        result = render(job)
+        result = inspect(job) if mode == "inspect" else render(job)
     except Exception as error:
-        result = {"schema_version": 1, "ok": False, "error": str(error), "warnings": []}
+        result = {"schema_version": SCHEMA_VERSION, "ok": False, "error": str(error), "warnings": []}
     if result_path:
         try:
             atomic_json(result_path, result)

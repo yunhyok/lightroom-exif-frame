@@ -9,12 +9,24 @@ import importlib.metadata
 import ssl
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.1.0"
+VERSION = "0.2.0"
+
+
+def _copy_resvg_license(licenses: Path) -> None:
+    dist = importlib.metadata.distribution("resvg-py")
+    for rel in dist.files or ():
+        if rel.name.upper().startswith("LICENSE"):
+            src = Path(dist.locate_file(rel))
+            if src.is_file():
+                shutil.copy2(src, licenses / "RESVG_PY.txt")
+                return
+    raise FileNotFoundError("resvg-py LICENSE file not found in distribution metadata")
 
 
 def main():
     subprocess.run([sys.executable, str(ROOT / "scripts/fetch_vendor.py")], check=True)
     subprocess.run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onedir", "--noconsole",
+                    "--paths", str(ROOT / "helper"), "--collect-all", "resvg_py",
                     "--name", "frame-helper", "--distpath", str(ROOT / "build/helper-dist"),
                     "--workpath", str(ROOT / "build/pyinstaller"), "--specpath", str(ROOT / "build"),
                     str(ROOT / "helper/frame_helper.py")], check=True, cwd=ROOT)
@@ -25,8 +37,11 @@ def main():
         assert binary.resolve().parent == bundle.resolve() and binary.name == "bin"
         shutil.rmtree(binary)
     shutil.copytree(ROOT / "build/helper-dist/frame-helper", binary, dirs_exist_ok=True)
+    shutil.copytree(ROOT / "helper/data", binary / "data", dirs_exist_ok=True)
+    shutil.copytree(ROOT / "helper/assets/logos", binary / "assets/logos", dirs_exist_ok=True)
     licenses = binary / "licenses"
     licenses.mkdir(exist_ok=True)
+    _copy_resvg_license(licenses)
     python_license = Path(sys.base_prefix) / "LICENSE.txt"
     if not python_license.is_file():
         python_license = Path(sys.base_prefix) / "LICENSE_PYTHON.txt"

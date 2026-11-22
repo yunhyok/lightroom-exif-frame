@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 160" width="360" height="160">
+  <rect x="8" y="8" width="344" height="144" rx="72" fill="{{INK}}"/>
+  <rect x="17" y="17" width="326" height="126" rx="63" fill="{{CONTRAST}}"/>
+  <rect x="23" y="23" width="314" height="114" rx="57" fill="#FFE100"/>
+  <g transform="translate(52,50) scale(0.66)">
+  <path d="M 0 0 L 15.67 0 L 15.67 100 L 0 100 Z M 52.92 0 L 68.6 0 L 68.6 100 L 52.92 100 Z M 0 0 L 17.32 0 L 68.6 100 L 51.27 100 Z" transform="translate(0,0)" fill="{{BADGE_DARK}}" fill-rule="nonzero"/>
+  <path d="M 3.16 28 L 18.01 28 L 18.01 100 L 3.16 100 Z M 2 10 A 8.58 8.58 0 1 1 19.16 10 A 8.58 8.58 0 1 1 2 10 Z" transform="translate(76.6,0)" fill="{{BADGE_DARK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 15.18 0 L 15.18 100 L 0 100 Z M 11.55 65 L 37.25 28 L 52.92 28 L 18.97 70 Z M 18.15 56 L 52.92 100 L 36.75 100 L 11.55 66 Z" transform="translate(105.77,0)" fill="{{BADGE_DARK}}" fill-rule="nonzero"/>
+  <path d="M 0 63 A 28.42 37 0 1 1 56.84 63 A 28.42 37 0 1 1 0 63 Z M 14.85 63 A 13.57 23.66 0 1 0 41.99 63 A 13.57 23.66 0 1 0 14.85 63 Z" transform="translate(166.69,0)" fill="{{BADGE_DARK}}" fill-rule="nonzero"/>
+  <path d="M 0 28 L 15.18 28 L 15.18 100 L 0 100 Z M 39.7 54 L 54.88 54 L 54.88 100 L 39.7 100 Z M 0 56 A 27.44 30 0 0 1 54.88 56 L 40.03 56 A 12.59 16.82 0 0 0 14.85 56 Z" transform="translate(231.53,0)" fill="{{BADGE_DARK}}" fill-rule="nonzero"/>
+</g>
+</svg>

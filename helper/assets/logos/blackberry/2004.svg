@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 160" width="540" height="160">
+  <rect x="30" y="52" width="18" height="18" rx="6" fill="#1475DC"/>
+  <rect x="56" y="52" width="18" height="18" rx="6" fill="#1475DC"/>
+  <rect x="24" y="78" width="18" height="18" rx="6" fill="#1475DC"/>
+  <rect x="50" y="78" width="18" height="18" rx="6" fill="#1475DC"/>
+  <rect x="76" y="78" width="18" height="18" rx="6" fill="#1475DC"/>
+  <rect x="30" y="104" width="18" height="18" rx="6" fill="#1475DC"/>
+  <rect x="56" y="104" width="18" height="18" rx="6" fill="#1475DC"/>
+  <g transform="translate(110,48) scale(0.64)">
+  <path d="M 0 0 L 29.78 0 A 28.54 28.22 0 0 1 29.78 56.44 L 0 56.44 Z M 13.5 12.69 L 13.5 43.75 L 29.78 43.75 A 15.04 15.53 0 0 0 29.78 12.69 Z M 0 42.83 L 31.02 42.83 A 31.02 28.59 0 0 1 31.02 100 L 0 100 Z M 13.5 55.52 L 13.5 87.31 L 31.02 87.31 A 17.52 15.9 0 0 0 31.02 55.52 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 3.99 0 L 16.41 0 L 16.41 100 L 3.99 100 Z" transform="translate(68.04,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 63 A 23.69 37 0 1 1 47.38 63 A 23.69 37 0 1 1 0 63 Z M 11.88 63 A 11.81 26.21 0 1 0 35.5 63 A 11.81 26.21 0 1 0 11.88 63 Z M 40.22 26 L 52.64 26 L 52.64 100 L 40.22 100 Z" transform="translate(94.44,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 47.19 85.78 A 26.4 37 0 1 1 47.19 40.22 L 37.62 46.94 A 14.25 26.09 0 1 0 37.62 79.06 Z" transform="translate(153.08,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 12.42 0 L 12.42 100 L 0 100 Z M 9.45 65 L 37.94 28 L 50.76 28 L 15.52 70 Z M 14.85 56 L 50.76 100 L 37.53 100 L 9.45 66 Z" transform="translate(207.96,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 0 L 29.78 0 A 28.54 28.22 0 0 1 29.78 56.44 L 0 56.44 Z M 13.5 12.69 L 13.5 43.75 L 29.78 43.75 A 15.04 15.53 0 0 0 29.78 12.69 Z M 0 42.83 L 31.02 42.83 A 31.02 28.59 0 0 1 31.02 100 L 0 100 Z M 13.5 55.52 L 13.5 87.31 L 31.02 87.31 A 17.52 15.9 0 0 0 31.02 55.52 Z" transform="translate(264.72,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 47.88 84.22 A 26.32 37 0 1 1 52.62 61.71 L 40.48 62.09 A 14.17 26.09 0 1 0 37.93 77.96 Z M 4.05 57 L 50.61 57 L 50.61 67.41 L 4.05 67.41 Z" transform="translate(332.76,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 28 L 12.42 28 L 12.42 100 L 0 100 Z M 2.86 52 A 20 26 0 0 1 28.04 26.89 L 24.96 36.94 A 8.12 15.59 0 0 0 14.74 52 Z" transform="translate(391.4,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 28 L 12.42 28 L 12.42 100 L 0 100 Z M 2.86 52 A 20 26 0 0 1 28.04 26.89 L 24.96 36.94 A 8.12 15.59 0 0 0 14.74 52 Z" transform="translate(433.12,0)" fill="{{INK}}" fill-rule="nonzero"/>
+  <path d="M 0 28 L 12.96 28 L 25.38 86 L 37.8 28 L 50.76 28 L 21.32 122 L 13.2 122 L 21.32 96 Z" transform="translate(474.84,0)" fill="{{INK}}" fill-rule="nonzero"/>
+</g>
+</svg>

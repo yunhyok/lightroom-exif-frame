@@ -1,72 +1,87 @@
-# Helper protocol v1
+# Frame Helper Protocol (`schema_version = 1`, Plug-in `0.2.0`)
 
-Invocation: `frame-helper.exe --job JOB.json`. UTF-8 JSON, no BOM required;
-reader accepts UTF-8 BOM. All paths absolute. The only command-line input is
-the job path; user text never appears on a shell command line.
+`LightroomExifFrame.lrplugin` (Lua) spawns `bin/frame-helper.exe` (PyInstaller frozen Python + ImageMagick 7 Q16 + ExifTool 13.59 + `resvg_py`) with no shell expansion (`LrTasks.execute` extra outer quotes on Windows).
 
+---
+
+## CLI Entry Points
+
+```text
+frame-helper.exe --job <absolute_job.json>
+frame-helper.exe --inspect <absolute_inspect.json>
+```
+
+Both modes decode `<json>` as UTF-8 with optional BOM (`utf-8-sig`, max `1 MiB`) and write `result.json` atomically (`os.replace` over sibling temp file) to `result_path`.
+
+- `--job`: Renders the 16-bit TIFF into JPG, PNG (8/16-bit), WebP (lossy/VP8L lossless), or 8-bit sRGB preview PNG, preserves ICC & mapped metadata/MWG regions, and atomically publishes output.
+- `--inspect`: Resolves manufacturer brand, hardware release year, and historical CI SVG metadata quickly without launching ImageMagick or rendering pixels.
+
+---
+
+## Job JSON Request Schema
+
+Required for `--job`:
+- `schema_version` (`1`), `input_path` (existing TIFF16 path), `output_path` (absolute target file path), `result_path` (absolute non-colliding JSON result path).
+
+Required for `--inspect`:
+- `schema_version` (`1`), `result_path`.
+
+Optional / v0.2.0 fields:
+- `source_path` (`string | null`): Original file path used only as read-only EXIF fallback when Lightroom metadata fields are blank. Never overwritten.
+- `preview` (`bool`, default `false`), `preview_max_size` (`64..4096`, default `600`).
+- `format` (`"jpg" | "png" | "webp"`), `quality` (`1..100`), `lossless` (`bool`), `bit_depth` (`8 | 16`), `color_space` (`"sRGB" | "AdobeRGB" | "ProPhotoRGB"`).
+- `theme` (16 options: `"strap"`, `"simple"`, `"one_line"`, `"two_line"`, `"shot_on_one_line"`, `"shot_on_two_line"`, `"film"`, `"monitor"`, `"lightroom"`, `"just_frame"`, `"cinemascope"`, `"custom_one_line"`, `"custom_two_line"`, `"poster"`, `"tip"`, `"none"`).
+- `appearance` (`"auto" | "light" | "dark" | "custom"`), `background_color`, `text_color`, `secondary_color` (`#RRGGBB`).
+- `aspect_ratio` (`"free" | "1:1" | "4:5" | "5:4" | "3:4" | "4:3" | "2:3" | "3:2" | "16:9" | "9:16"`), `no_crop` (`bool`), `padding_inside` (`bool`), `compact` (`bool`).
+- `font_path`, `font_percent` (`0.2..10`), `band_percent` (`1..40`), `padding_percent` (`0..20`), `logo_percent` (`1..50`).
+- `font_style` (`"normal" | "italic"`), `text_align` (`"left" | "center" | "right"`), `text_alpha` (`0.05..1.0`), `shadow_size` (`0..50`).
+- `logo_mode` (`"auto_era" | "auto_latest" | "manual_era" | "text_only" | "none"`), `logo_style` (`"brand" | "mono"`), `manual_brand`, `manual_era`.
+- `focal_mode` (`"equivalent" | "actual" | "ratio"`), `crop_factor` (`0.1..20`), `date_notation` (10 options), `show_make`, `show_model`, `show_lens`, `show_exposure`, `override_make`, `override_model`, `override_lens`, `artist`, `label`, `divider`.
+- `collision_mode` (`"rename" | "overwrite" | "skip" | "ask"`), `remove_person_info` (`bool`).
+- `templates` (`list[str]` of 4 templates), `metadata` (`dict[str, str]`), `logos` (`dict[brand_key, png_or_svg_path]`).
+
+---
+
+## Result JSON Response Schema
+
+On success (`exit 0`):
 ```json
 {
   "schema_version": 1,
-  "input_path": "C:/work/rendered.tif",
-  "output_path": "C:/export/photo_frame.webp",
-  "result_path": "C:/work/result.json",
-  "source_path": "C:/photos/original.dng",
-  "preview": false,
-  "remove_person_info": false,
-  "preview_max_size": 600,
-  "format": "webp",
-  "quality": 95,
-  "lossless": false,
-  "bit_depth": 8,
-  "color_space": "sRGB",
-  "theme": "strap",
-  "appearance": "light",
-  "background_color": "#ffffff",
-  "text_color": "#161616",
-  "secondary_color": "#555555",
-  "font_path": "C:/Windows/Fonts/malgun.ttf",
-  "font_percent": 1.65,
-  "band_percent": 7.3,
-  "padding_percent": 1.7,
-  "logo_percent": 10,
-  "focal_mode": "equivalent",
-  "artist": "",
-  "templates": ["ISO{iso} {focal}mm F{aperture} {shutter}s", "{date}", "{make} {model}", "{lens}"],
-  "metadata": {"make":"RICOH IMAGING COMPANY, LTD.","model":"PENTAX K-3 Mark III","lens":"HD PENTAX-D FA 150-450mm F4.5-5.6ED DC AW","iso":"1000","aperture":"9","shutter":"1/800","focal":"630","focal35":"973","date":"2024/04/08 12:31:11"},
-  "logos": {"pentax": "C:/logos/pentax.png"}
+  "ok": true,
+  "output_path": "C:\\Export\\Photo.jpg",
+  "width": 3264,
+  "height": 2686,
+  "warnings": [],
+  "brand_info": {
+    "brand_id": "kodak",
+    "brand_name": "Kodak",
+    "era_id": "2006",
+    "era_label": "2006–2016 (Rounded Red Wordmark)",
+    "era_label_ko": "2006–2016 (둥근 레드 워드마크)",
+    "detected_year": 2006,
+    "year_source": "database",
+    "logo_source": "builtin_svg"
+  }
+}
+```
+(`--inspect` omits `output_path`, `width`, and `height`.)
+
+On failure (`exit 1`):
+```json
+{
+  "schema_version": 1,
+  "ok": false,
+  "error": "...",
+  "warnings": []
 }
 ```
 
-Formats: jpg/png/webp. Themes: strap/simple/none. Color spaces:
-sRGB/AdobeRGB/ProPhotoRGB. JPEG is 8-bit, PNG 8/16-bit, WebP sRGB8.
-Lightroom must render TIFF16 already in chosen destination profile (sRGB
-for WebP). Input TIFF is the sole embedded-metadata source. Original
-source_path is optional and may only supply missing *visible* frame fields.
-Preview input must also be a Lightroom-rendered TIFF; preview output is sRGB8
-PNG but layout is computed at the input's actual size before downsampling.
+---
 
-`remove_person_info` is an optional boolean, default false. Lua passes the native
-`LR_removeFaceMetadata` choice. When true, the metadata module additionally removes
-typed person/face-region metadata that Lightroom may leave in the rendered TIFF.
-This does not modify the TIFF or original file, and does not heuristically remove
-names from captions, creator contacts, or ordinary keywords. Upstream Lightroom
-exclusion failures and final-output privacy enforcement must be reported separately.
+## Security & Atomicity Invariants
 
-Helper dependencies next to EXE: `imagemagick/magick.exe`,
-`exiftool/exiftool.exe` and its official support files. Development overrides:
-`EXIF_FRAME_MAGICK`, `EXIF_FRAME_EXIFTOOL` absolute paths.
-
-Result written atomically (success or failure):
-`{"schema_version":1,"ok":true,"output_path":"...","width":1920,"height":1420,"warnings":[]}`
-or `{"schema_version":1,"ok":false,"error":"...","warnings":[]}`.
-Exit 0 success, nonzero failure. Existing output paths are never overwritten;
-numbered suffixes are allocated atomically. Preview can use fresh unique names.
-
-Metadata module interface:
-`read_display_metadata(source: pathlib.Path, exiftool: pathlib.Path) -> dict[str,str]`;
-`copy_metadata(source: pathlib.Path, destination: pathlib.Path, *, exiftool: pathlib.Path,
-format: str, width: int, height: int, body_width: int, body_height: int,
-offset_x: int, offset_y: int, remove_person_info: bool = False) -> list[str]`.
-Returns warnings; raises on metadata failure. Renderer owns ICC and pixels;
-metadata module must not overwrite ICC. Renderer strips metadata from its
-intermediates before copying only the Lightroom-filtered metadata.
+- All paths must be absolute strings without NUL characters; `result_path` cannot collide with `job_path`, `input_path`, `source_path`, `output_path`, `font_path`, or user `logos`.
+- `publish()` never overwrites `source_path` even if `collision_mode == "overwrite"`.
+- In `"rename"` mode, outputs allocate unique `_1`, `_2`, ... suffixes atomically without overwrite.
+- Bundled `helper/data/` and `helper/assets/logos/` contain only pure-vector SVGs (`<text>` forbidden) and offline JSON catalogs; `resvg_py` renders SVGs with `skip_system_fonts=True` for built-in logos.
