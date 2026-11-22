@@ -363,7 +363,7 @@ class RenderTests(unittest.TestCase):
         target.write_bytes(b"stale content")
         ow_job = dict(self.job, format="jpg", bit_depth=8, output_path=str(target), collision_mode="overwrite")
         res = renderer.render(ow_job)
-        self.assertEqual(Path(res["output_path"]), target)
+        self.assertEqual(Path(res["output_path"]).resolve(), target.resolve())
         self.assertTrue(target.read_bytes().startswith(b"\xff\xd8\xff"))
 
         # Source photo must never be overwritten even if collision_mode == "overwrite"
