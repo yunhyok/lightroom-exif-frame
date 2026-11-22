@@ -84,25 +84,41 @@ def _norm_compact(text: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", (text or "").upper())
 
 
+def _expand_hex(color: str) -> str:
+    val = color.strip().upper()
+    if re.fullmatch(r"#[0-9A-F]{3}", val):
+        return f"#{val[1] * 2}{val[2] * 2}{val[3] * 2}"
+    return val
+
+
 def _is_dark_hex(color: str | None) -> bool | None:
-    if not color or not re.fullmatch(r"#[0-9a-fA-F]{6}", color):
+    if not color:
         return None
-    r, g, b = (int(color[i:i + 2], 16) / 255.0 for i in (1, 3, 5))
+    expanded = _expand_hex(color)
+    if not re.fullmatch(r"#[0-9A-F]{6}", expanded):
+        return None
+    r, g, b = (int(expanded[i:i + 2], 16) / 255.0 for i in (1, 3, 5))
     lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
     return lum < 0.45
 
 
 def _lift_dark_brand_hex(hex_color: str) -> str:
-    """Ensure deep corporate brand blues/greens stay readable on dark #171717 frames."""
-    srgb = [int(hex_color[i:i + 2], 16) / 255.0 for i in (1, 3, 5)]
+    """Ensure deep chromatic corporate blues/greens stay readable on dark #171717 frames."""
+    expanded = _expand_hex(hex_color)
+    if not re.fullmatch(r"#[0-9A-F]{6}", expanded):
+        return hex_color
+    srgb = [int(expanded[i:i + 2], 16) / 255.0 for i in (1, 3, 5)]
+    import colorsys
+    h, l, s = colorsys.rgb_to_hls(*srgb)
+    # Preserve achromatic dark neutrals (e.g., black lettering inside yellow Nikon/Kodak badges)
+    if s < 0.15:
+        return expanded
     lin = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in srgb]
     lum = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
     if lum >= 0.16:
-        return hex_color
-    import colorsys
-    h, l, s = colorsys.rgb_to_hls(*srgb)
+        return expanded
     l = max(l, 0.58)
-    s = max(s, 0.72) if s > 0.05 else s
+    s = max(s, 0.72)
     nr, ng, nb = colorsys.hls_to_rgb(h, l, s)
     return f"#{round(nr * 255):02X}{round(ng * 255):02X}{round(nb * 255):02X}"
 
@@ -476,6 +492,7 @@ def _transform_svg_colors(
     ink = text_color if (text_color and re.fullmatch(r"#[0-9a-fA-F]{6}", text_color)) else ("#F2F2F2" if dark else "#141414")
     ink_muted = secondary_color if (secondary_color and re.fullmatch(r"#[0-9a-fA-F]{6}", secondary_color)) else ("#BDBDBD" if dark else "#555555")
     bg = background_color if (background_color and re.fullmatch(r"#[0-9a-fA-F]{6}", background_color)) else ("#171717" if dark else "#FFFFFF")
+    is_badge = bool(re.search(r'<svg\b[^>]*\bdata-logo-badge\s*=\s*["\']1["\']', svg_text, re.IGNORECASE))
 
     if style == "mono":
         contrast = bg
@@ -486,29 +503,69 @@ def _transform_svg_colors(
         seen_hex: dict[str, str] = {}
         opacities = ("1.0", "0.78", "0.60", "0.45", "0.88", "0.68")
 
-        def mono_sub(match: re.Match[str]) -> str:
-            attr, val = match.group(1), match.group(2).upper()
-            if val in ("#FFFFFF", "#FFF"):
-                return f'{attr}="{contrast}"'
+        def mono_resolve(raw_val: str) -> tuple[str, str | None]:
+            val = _expand_hex(raw_val)
+            if val == "#FFFFFF":
+                return contrast, None
+            if is_badge and val in ("#000000", "#141414", "#111111", "#231F20", "#1D1D1B"):
+                return contrast, None
             if val not in seen_hex:
                 seen_hex[val] = opacities[len(seen_hex) % len(opacities)]
             op = seen_hex[val]
-            op_attr = f' {attr}-opacity="{op}"' if op != "1.0" and attr in ("fill", "stroke") else ""
-            return f'{attr}="{ink}"{op_attr}'
+            return ink, (op if op != "1.0" else None)
 
-        transformed = re.sub(r'(fill|stroke|stop-color)="(#[0-9a-fA-F]{3,6})"', mono_sub, svg_text)
+        def mono_attr_sub(match: re.Match[str]) -> str:
+            attr, val = match.group(1), match.group(3)
+            col, op = mono_resolve(val)
+            op_attr = f' {attr}-opacity="{op}"' if op and attr.lower() in ("fill", "stroke") else ""
+            return f'{attr}="{col}"{op_attr}'
+
+        def mono_css_sub(match: re.Match[str]) -> str:
+            attr, val = match.group(1), match.group(2)
+            col, op = mono_resolve(val)
+            op_css = f';{attr}-opacity:{op}' if op and attr.lower() in ("fill", "stroke") else ""
+            return f'{attr}:{col}{op_css}'
+
+        transformed = re.sub(
+            r'\b(fill|stroke|stop-color)\s*=\s*(["\'])(#[0-9a-fA-F]{3,6})\2',
+            mono_attr_sub,
+            svg_text,
+            flags=re.IGNORECASE,
+        )
+        transformed = re.sub(
+            r'(?<![a-zA-Z-])(fill|stroke|stop-color)\s*:\s*(#[0-9a-fA-F]{3,6})',
+            mono_css_sub,
+            transformed,
+            flags=re.IGNORECASE,
+        )
+        if not re.search(r'<svg\b[^>]*\bfill\s*=', transformed, re.IGNORECASE):
+            transformed = re.sub(r'<svg\b', '<svg fill="{{INK}}"', transformed, count=1, flags=re.IGNORECASE)
     else:
         contrast = "#FFFFFF" if not dark else bg
         badge_fg = "#FFFFFF"
         badge_dark = "#141414"
         kodak_k = "#ED0000"
         if dark:
-            def dark_lift(match: re.Match[str]) -> str:
+            def dark_attr_lift(match: re.Match[str]) -> str:
+                attr, val = match.group(1), match.group(3)
+                return f'{attr}="{_lift_dark_brand_hex(val)}"'
+
+            def dark_css_lift(match: re.Match[str]) -> str:
                 attr, val = match.group(1), match.group(2)
-                if len(val) == 7:
-                    return f'{attr}="{_lift_dark_brand_hex(val)}"'
-                return match.group(0)
-            transformed = re.sub(r'(fill|stroke|stop-color)="(#[0-9a-fA-F]{6})"', dark_lift, svg_text)
+                return f'{attr}:{_lift_dark_brand_hex(val)}'
+
+            transformed = re.sub(
+                r'\b(fill|stroke|stop-color)\s*=\s*(["\'])(#[0-9a-fA-F]{3,6})\2',
+                dark_attr_lift,
+                svg_text,
+                flags=re.IGNORECASE,
+            )
+            transformed = re.sub(
+                r'(?<![a-zA-Z-])(fill|stroke|stop-color)\s*:\s*(#[0-9a-fA-F]{3,6})',
+                dark_css_lift,
+                transformed,
+                flags=re.IGNORECASE,
+            )
         else:
             transformed = svg_text
 
@@ -524,13 +581,21 @@ def _transform_svg_colors(
 
 
 def _svg_dimensions(svg_text: str) -> tuple[float, float]:
-    vb = re.search(r'viewBox="[^"]*?\s([0-9.]+)\s+([0-9.]+)"', svg_text)
+    vb = re.search(r'viewBox\s*=\s*(["\'])([^"\']+)\1', svg_text)
     if vb:
-        return max(1.0, float(vb.group(1))), max(1.0, float(vb.group(2)))
-    wm = re.search(r'width="([0-9.]+)"', svg_text)
-    hm = re.search(r'height="([0-9.]+)"', svg_text)
+        parts = [p for p in re.split(r"[,\s]+", vb.group(2).strip()) if p]
+        if len(parts) == 4:
+            try:
+                return max(1.0, float(parts[2])), max(1.0, float(parts[3]))
+            except ValueError:
+                pass
+    wm = re.search(r'\bwidth\s*=\s*(["\'])([0-9.]+)(?:px)?\1', svg_text)
+    hm = re.search(r'\bheight\s*=\s*(["\'])([0-9.]+)(?:px)?\1', svg_text)
     if wm and hm:
-        return max(1.0, float(wm.group(1))), max(1.0, float(hm.group(1)))
+        try:
+            return max(1.0, float(wm.group(2))), max(1.0, float(hm.group(2)))
+        except ValueError:
+            pass
     return 400.0, 160.0
 
 

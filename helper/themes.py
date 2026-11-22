@@ -292,22 +292,22 @@ def build_theme_layers(
     def colored_layer(prefix: list[str], path: Path) -> None:
         run_fn(magick, [*prefix, "-profile", str(srgb), "-profile", str(profile), "+profile", "!icc,*", "-depth", "16", str(path)])
 
-    def text_layer(
+    def prepare_text_layer(
         text: str,
-        slot: tuple[int, int, int, int],
+        available_width: int,
+        available_height: int,
         color: str,
         *,
         h_align: str = "left",
         nominal: int | None = None,
         layer_alpha: float = alpha,
         layer_shadow: float = shadow_size,
-    ) -> None:
+    ) -> tuple[Path, int, int] | None:
         if not text or not text.strip():
-            return
-        x, y, available_width, available_height = slot
+            return None
         if available_width < 1 or available_height < 1:
             warnings.append(f"Text area {layer_seq[0] + 1} has no space")
-            return
+            return None
         idx = layer_seq[0]
         layer_seq[0] += 1
         textfile, layer = work / f"text-{idx}.utf8", work / f"text-{idx}.miff"
@@ -334,11 +334,11 @@ def build_theme_layers(
             smaller = max(4, min(point - 1, int(point * min(available_width / tw, available_height / th) * 0.95)))
             if smaller >= point:
                 warnings.append(f"Text area {idx + 1} omitted: cannot fit without overlap")
-                return
+                return None
             point = smaller
         else:
             warnings.append(f"Text area {idx + 1} omitted: cannot fit without overlap")
-            return
+            return None
 
         if font_style == "italic":
             sheared = work / f"text-{idx}-it.miff"
@@ -372,6 +372,32 @@ def build_theme_layers(
             layer = shadowed
             tw, th, *_ = image_info_fn(magick, str(layer))
 
+        return layer, tw, th
+
+    def text_layer(
+        text: str,
+        slot: tuple[int, int, int, int],
+        color: str,
+        *,
+        h_align: str = "left",
+        nominal: int | None = None,
+        layer_alpha: float = alpha,
+        layer_shadow: float = shadow_size,
+    ) -> None:
+        x, y, available_width, available_height = slot
+        prepared = prepare_text_layer(
+            text,
+            available_width,
+            available_height,
+            color,
+            h_align=h_align,
+            nominal=nominal,
+            layer_alpha=layer_alpha,
+            layer_shadow=layer_shadow,
+        )
+        if prepared is None:
+            return
+        layer, tw, th = prepared
         draw_x = x
         if h_align == "center":
             draw_x += max(0, (available_width - tw) // 2)
@@ -429,25 +455,98 @@ def build_theme_layers(
     if theme == "strap":
         gap, line_width = max(1, round(eff_w * 0.015)), max(1, round(eff_w / 1920))
         usable = max(1, canvas_w - 2 * padding)
-        right_width = max(1, round(usable * 0.43))
+        box_h = max(1, band - 2 * vertical)
+        row = max(1, box_h // 2)
+
+        l_top = texts[0].strip()
+        l_bot = "" if (texts[1].strip() == "—" and l_top) else texts[1].strip()
+        r_top = texts[2].strip()
+        r_bot = "" if (texts[3].strip() == "—" and r_top) else texts[3].strip()
+        has_left = bool(l_top or l_bot)
+        has_right = bool(r_top or r_bot)
+
+        right_cap = max(1, round(usable * 0.48)) if has_left else max(1, round(usable * 0.72))
+        r_top_prep = prepare_text_layer(r_top, right_cap, row, text_color, h_align="left") if r_top else None
+        r_bot_prep = prepare_text_layer(r_bot, right_cap, row, secondary_color, h_align="left") if r_bot else None
+        actual_right_w = max(r_top_prep[1] if r_top_prep else 0, r_bot_prep[1] if r_bot_prep else 0)
+        has_right_drawn = bool(r_top_prep or r_bot_prep) and actual_right_w > 0
+
         desired_logo = max(1, round(eff_w * job["logo_percent"] / 100))
-        logo_width = max(1, min(desired_logo, usable - right_width - 3 * gap - line_width - max(1, round(usable * 0.15))))
-        if logo_width < desired_logo:
+        sep_space = (2 * gap + line_width) if has_right_drawn else 0
+        min_left_reserve = max(1, round(usable * 0.20)) if has_left else 0
+        max_logo_slot = max(1, usable - actual_right_w - sep_space - (gap if has_left else 0) - min_left_reserve)
+        logo_slot_w = min(desired_logo, max_logo_slot)
+        if logo_slot_w < desired_logo:
             warnings.append("Logo area reduced to retain space for metadata")
-        left_width = max(1, usable - right_width - logo_width - 3 * gap - line_width)
-        logo_x = padding + left_width + gap
-        separator = logo_x + logo_width + gap
-        right_edge = separator + line_width + gap
-        row = max(1, (band - 2 * vertical) // 2)
-        for index, text in enumerate(texts):
-            x = padding if index < 2 else right_edge
-            slotwidth = left_width if index < 2 else canvas_w - padding - right_edge
-            text_layer(text, (x, footer_y + vertical + (index % 2) * row, slotwidth, row),
-                       text_color if index % 2 == 0 else secondary_color, h_align="left")
-        line = work / "separator.miff"
-        colored_layer(["-size", f"{line_width}x{max(1, band - 2 * vertical)}", "xc:" + secondary_color], line)
-        args.extend(["(", str(line), ")", "-compose", "Over", "-gravity", "NorthWest", "-geometry", f"+{separator}+{footer_y + vertical}", "-composite"])
-        composite_logo(logo_x, footer_y + vertical, logo_width, max(1, band - 2 * vertical), h_align="center")
+
+        logo_res = compose_logo(
+            job=job,
+            resolution=resolution,
+            box_w=logo_slot_w,
+            box_h=box_h,
+            is_dark=is_dark,
+            bg_color=bg_color,
+            text_color=text_color,
+            secondary_color=secondary_color,
+            work=work,
+            profile=profile,
+            srgb=srgb,
+            run_fn=run_fn,
+            image_info_fn=image_info_fn,
+            magick=magick,
+            warnings=warnings,
+        )
+        brand_prep = None
+        if logo_res is None and resolution.logo_source == "text_fallback" and brand:
+            brand_font = max(fontsize, min(round(band * 0.6), round(eff_w * job["logo_percent"] / 100 * 0.3)))
+            brand_prep = prepare_text_layer(brand, logo_slot_w, box_h, text_color, h_align="right", nominal=brand_font)
+
+        logo_layer = logo_res if logo_res is not None else brand_prep
+        actual_lw = logo_layer[1] if logo_layer is not None else 0
+
+        if has_right_drawn:
+            right_block_x = max(padding, canvas_w - padding - actual_right_w)
+            if r_top_prep is not None:
+                layer, tw, th = r_top_prep
+                args.extend([
+                    "(", str(layer), ")", "-compose", "Over", "-gravity", "NorthWest",
+                    "-geometry", f"+{right_block_x}+{footer_y + vertical + max(0, (row - th) // 2)}",
+                    "-composite",
+                ])
+            if r_bot_prep is not None:
+                layer, tw, th = r_bot_prep
+                args.extend([
+                    "(", str(layer), ")", "-compose", "Over", "-gravity", "NorthWest",
+                    "-geometry", f"+{right_block_x}+{footer_y + vertical + row + max(0, (row - th) // 2)}",
+                    "-composite",
+                ])
+            separator_x = max(padding, right_block_x - gap - line_width)
+            line = work / "separator.miff"
+            colored_layer(["-size", f"{line_width}x{box_h}", "xc:" + secondary_color], line)
+            args.extend([
+                "(", str(line), ")", "-compose", "Over", "-gravity", "NorthWest",
+                "-geometry", f"+{separator_x}+{footer_y + vertical}",
+                "-composite",
+            ])
+            logo_x = max(padding, separator_x - gap - actual_lw)
+        else:
+            separator_x = canvas_w - padding
+            logo_x = max(padding, canvas_w - padding - actual_lw)
+
+        if logo_layer is not None:
+            l_path, _, l_h = logo_layer
+            args.extend([
+                "(", str(l_path), ")", "-compose", "Over", "-gravity", "NorthWest",
+                "-geometry", f"+{logo_x}+{footer_y + vertical + max(0, (box_h - l_h) // 2)}",
+                "-composite",
+            ])
+
+        left_bound = (logo_x - gap) if actual_lw > 0 else ((separator_x - gap) if has_right_drawn else (canvas_w - padding))
+        left_width = max(1, left_bound - padding)
+        if l_top:
+            text_layer(l_top, (padding, footer_y + vertical, left_width, row), text_color, h_align="left")
+        if l_bot:
+            text_layer(l_bot, (padding, footer_y + vertical + row, left_width, row), secondary_color, h_align="left")
 
     elif theme == "simple":
         joined = "\n".join(t for t in texts if t.strip())

@@ -47,6 +47,7 @@ class LogoTests(unittest.TestCase):
                 svg_text = svg_path.read_text(encoding="utf-8")
                 self.assertIn("<svg", svg_text.lower())
                 self.assertNotIn("<text", svg_text.lower(), f"Disallowed <text> in {era['svg']}")
+                self.assertNotIn("<image", svg_text.lower(), f"Disallowed <image> in {era['svg']}")
 
             models = cameras_raw.get(brand["id"], [])
             self.assertGreaterEqual(len(models), 1, f"No models for {brand['id']}")
@@ -158,6 +159,67 @@ class LogoTests(unittest.TestCase):
                         self.assertGreater(len(png), 150, f"Empty PNG for {era['svg']}")
                         count += 1
         self.assertEqual(count, 93 * 4)
+
+    def test_sony_wide_aspect_and_nikon_dark_badge_black_lettering(self):
+        import struct
+        import zlib
+
+        sony_svg = (ASSETS / "sony" / "1973.svg").read_text(encoding="utf-8")
+        vw, vh = logos._svg_dimensions(sony_svg)
+        self.assertGreaterEqual(vw / vh, 3.5)
+
+        nikon_png = logos.rasterize_svg_to_png(
+            ASSETS / "nikon" / "2003.svg",
+            200,
+            200,
+            is_dark=True,
+            style="brand",
+            text_color="#f4f4f4",
+            background_color="#171717",
+            secondary_color="#bbbbbb",
+        )
+        # Decode PNG RGBA scanlines and verify pure-black pixels remain inside the yellow badge
+        pos = 8
+        w = h = 0
+        idat = bytearray()
+        while pos + 8 <= len(nikon_png):
+            length = struct.unpack(">I", nikon_png[pos:pos + 4])[0]
+            ctype = nikon_png[pos + 4:pos + 8]
+            chunk = nikon_png[pos + 8:pos + 8 + length]
+            pos += 12 + length
+            if ctype == b"IHDR":
+                w, h = struct.unpack(">II", chunk[:8])
+            elif ctype == b"IDAT":
+                idat.extend(chunk)
+        raw = zlib.decompress(bytes(idat))
+        stride = w * 4
+        prev = bytearray(stride)
+        dark_pixels = 0
+        off = 0
+        for _ in range(h):
+            ft = raw[off]
+            off += 1
+            row = bytearray(raw[off:off + stride])
+            off += stride
+            for i in range(stride):
+                a = row[i - 4] if i >= 4 else 0
+                b = prev[i]
+                c = prev[i - 4] if i >= 4 else 0
+                if ft == 1:
+                    row[i] = (row[i] + a) & 0xFF
+                elif ft == 2:
+                    row[i] = (row[i] + b) & 0xFF
+                elif ft == 3:
+                    row[i] = (row[i] + ((a + b) >> 1)) & 0xFF
+                elif ft == 4:
+                    p = a + b - c
+                    pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                    row[i] = (row[i] + (a if pa <= pb and pa <= pc else (b if pb <= pc else c))) & 0xFF
+            prev = row
+            for x in range(0, stride, 4):
+                if row[x + 3] > 200 and row[x] < 30 and row[x + 1] < 30 and row[x + 2] < 30:
+                    dark_pixels += 1
+        self.assertGreater(dark_pixels, 200, "Yellow Nikon badge must keep crisp black text on dark frames")
 
 
 if __name__ == "__main__":

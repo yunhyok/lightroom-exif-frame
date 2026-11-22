@@ -976,7 +976,7 @@ function Frame.diagnostics()
         if type(v) == 'string' and v ~= '' then customCount = customCount + 1 end
     end
     local lines = {
-        'Lightroom EXIF Frame 0.2.1',
+        'Lightroom EXIF Frame 0.2.2',
         'Windows: ' .. tostring(WIN_ENV),
         T('Plug-in: ', '플러그인: ') .. _PLUGIN.path,
         'Built-in CI Brands: ' .. tostring(#brands),

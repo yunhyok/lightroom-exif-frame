@@ -1,8 +1,9 @@
 # Third-party programs
 
 The plug-in's original Lua and Python source is MIT licensed. Built-in pure-vector
-era brand CI SVGs (rendered locally without remote font or web fetches) and the
-hardware release-year database are bundled in the helper package; Windows fonts
+era brand CI SVGs (`scripts/logo_sources.json`, normalized cleanly into pure vector
+geometry without `<text>`, `<image>`, remote font fetches, or runtime web requests)
+and the hardware release-year database are bundled in the helper package; Windows fonts
 and optional user PNG/SVG logo overrides remain local.
 
 Paths below are relative to the extracted `LightroomExifFrame.lrplugin` folder.

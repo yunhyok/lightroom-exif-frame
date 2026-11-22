@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" width="520" height="160">
+<svg viewBox="3.9347 20.0971 435.9586 119.8058" width="435.9586" height="119.8058" fill="{{INK}}" xmlns="http://www.w3.org/2000/svg">
   <circle cx="64" cy="80" r="46" fill="none" stroke="#0072CE" stroke-width="10"/><circle cx="64" cy="80" r="22" fill="#0072CE"/><circle cx="72" cy="72" r="7" fill="{{BADGE_FG}}"/>
   <g transform="translate(128,42) scale(0.72)">
   <path d="M 3.33 0 L 18.33 0 L 18.33 100 L 3.33 100 Z" transform="translate(0,0)" fill="{{INK}}" fill-rule="nonzero"/>

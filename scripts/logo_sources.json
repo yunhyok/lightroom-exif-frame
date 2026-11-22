@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {"brand_id": "canon", "era_id": "1935", "mode": "retained", "source": "canon/1935.svg", "color_mode": "ink"},
+    {"brand_id": "canon", "era_id": "1956", "mode": "raw", "source": "canon__1956.svg", "wiki_host": "commons", "wiki_title": "File:Canon wordmark.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "nikon", "era_id": "1968", "mode": "derived", "source": "nikon_1968", "wiki_host": "commons", "wiki_title": "File:Nikon Logo.svg", "color_mode": "badge"},
+    {"brand_id": "nikon", "era_id": "1988", "mode": "derived", "source": "nikon_1988", "wiki_host": "commons", "wiki_title": "File:Nikon Logo.svg", "color_mode": "ink"},
+    {"brand_id": "nikon", "era_id": "2003", "mode": "raw", "source": "nikon__2003.svg", "wiki_host": "commons", "wiki_title": "File:Nikon Logo.svg", "color_mode": "badge", "recolor": {"#150301": "#000000"}},
+
+    {"brand_id": "sony", "era_id": "1973", "mode": "raw", "source": "sony__1973.svg", "wiki_host": "commons", "wiki_title": "File:Sony logo.svg", "color_mode": "ink"},
+    {"brand_id": "sony-alpha", "era_id": "2006", "mode": "derived", "source": "sony_alpha_2006", "wiki_host": "commons", "wiki_title": "File:Sony Alpha logo.svg", "color_mode": "ink"},
+
+    {"brand_id": "minolta", "era_id": "1981", "mode": "raw", "source": "minolta__1981.svg", "wiki_host": "commons", "wiki_title": "File:Minolta Logo.svg", "color_mode": "ink"},
+    {"brand_id": "konica-minolta", "era_id": "2003", "mode": "raw", "source": "konica-minolta__2003.svg", "wiki_host": "commons", "wiki_title": "File:Logo Konica Minolta.svg", "color_mode": "ink"},
+
+    {"brand_id": "fujifilm", "era_id": "1980", "mode": "raw", "source": "fujifilm__1980_a.svg", "wiki_host": "commons", "wiki_title": "File:Fujifilm old logo.svg", "color_mode": "ink"},
+    {"brand_id": "fujifilm", "era_id": "2006", "mode": "raw", "source": "fujifilm__2006.svg", "wiki_host": "commons", "wiki_title": "File:Fujifilm logo.svg", "color_mode": "ink"},
+
+    {"brand_id": "olympus", "era_id": "1970", "mode": "derived", "source": "olympus_1970", "wiki_host": "commons", "wiki_title": "File:Olympus Corporation logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "olympus", "era_id": "2001", "mode": "raw", "source": "olympus__2001.svg", "wiki_host": "commons", "wiki_title": "File:Olympus Corporation logo.svg", "color_mode": "brand_color", "strip_ids": ["_137995520", "_138002232"]},
+    {"brand_id": "om-system", "era_id": "2021", "mode": "raw", "source": "om-system__2021_b.svg", "wiki_host": "commons", "wiki_title": "File:OMDS OM-System-Logo.svg", "color_mode": "ink", "strip_ids": ["rect3807"], "recolor": {"#FFFFFF": "{{CONTRAST}}", "#000000": "{{INK}}"}},
+
+    {"brand_id": "panasonic", "era_id": "1971", "mode": "raw", "source": "panasonic__1971.svg", "wiki_host": "commons", "wiki_title": "File:Panasonic logo (Blue).svg", "color_mode": "brand_color"},
+    {"brand_id": "lumix", "era_id": "2001", "mode": "raw", "source": "lumix__2001.svg", "wiki_host": "commons", "wiki_title": "File:Lumix logo.svg", "color_mode": "ink"},
+
+    {"brand_id": "pentax", "era_id": "1957", "mode": "derived", "source": "pentax_1957", "wiki_host": "commons", "wiki_title": "File:Pentax wordmark.svg", "color_mode": "ink"},
+    {"brand_id": "pentax", "era_id": "1987", "mode": "raw", "source": "pentax__1987_b.svg", "wiki_host": "commons", "wiki_title": "File:Pentax wordmark.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "ricoh", "era_id": "1986", "mode": "raw", "source": "ricoh__1986.svg", "wiki_host": "commons", "wiki_title": "File:Ricoh logo 1986.svg", "color_mode": "brand_color"},
+    {"brand_id": "ricoh", "era_id": "2005", "mode": "raw", "source": "ricoh__2005.svg", "wiki_host": "commons", "wiki_title": "File:Ricoh logo 2005.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "leica", "era_id": "1976", "mode": "raw", "source": "leica__1976.svg", "wiki_host": "commons", "wiki_title": "File:Leitz Camera.svg", "color_mode": "badge"},
+    {"brand_id": "leica", "era_id": "1986", "mode": "raw", "source": "leica__1986_b.svg", "wiki_host": "commons", "wiki_title": "File:Leica Camera.svg", "color_mode": "badge"},
+
+    {"brand_id": "sigma", "era_id": "1961", "mode": "raw", "source": "sigma__1961.svg", "wiki_host": "commons", "wiki_title": "File:Sigma Logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "sigma", "era_id": "2012", "mode": "raw", "source": "sigma__2012.svg", "wiki_host": "commons", "wiki_title": "File:SIGMA CORPORATION.svg", "color_mode": "ink"},
+    {"brand_id": "sigma", "era_id": "2025", "mode": "raw", "source": "sigma__2025.svg", "wiki_host": "commons", "wiki_title": "File:Sigma's new updated logo revealed, February 2025.svg", "color_mode": "ink"},
+
+    {"brand_id": "hasselblad", "era_id": "1990", "mode": "derived", "source": "hasselblad_1990", "wiki_host": "commons", "wiki_title": "File:Hasselblad Logo.svg", "color_mode": "ink", "recolor": {"#0C3C60": "{{INK}}"}},
+    {"brand_id": "hasselblad", "era_id": "2015", "mode": "raw", "source": "hasselblad__2015.svg", "wiki_host": "commons", "wiki_title": "File:Hasselblad logo.svg", "color_mode": "ink"},
+
+    {"brand_id": "kodak", "era_id": "1987", "mode": "raw", "source": "kodak__1987.svg", "wiki_host": "commons", "wiki_title": "File:Logo of the Eastman Kodak Company (1987–2006).svg", "color_mode": "badge", "recolor": {"#FE000C": "{{KODAK_K}}"}},
+    {"brand_id": "kodak", "era_id": "2006", "mode": "raw", "source": "kodak__2006.svg", "wiki_host": "commons", "wiki_title": "File:Logo of the Eastman Kodak Company (2006–2016).svg", "color_mode": "brand_color"},
+    {"brand_id": "kodak", "era_id": "2016", "mode": "raw", "source": "kodak__2016.svg", "wiki_host": "commons", "wiki_title": "File:Eastman Kodak Company logo (2016).svg", "color_mode": "badge", "recolor": {"#E30613": "{{KODAK_K}}"}},
+
+    {"brand_id": "samsung", "era_id": "1993", "mode": "raw", "source": "samsung__1993.svg", "wiki_host": "commons", "wiki_title": "File:Samsung old logo before year 2015.svg", "color_mode": "badge"},
+    {"brand_id": "samsung", "era_id": "2015", "mode": "raw", "source": "samsung__2015.svg", "wiki_host": "commons", "wiki_title": "File:Samsung wordmark.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "polaroid", "era_id": "1977", "mode": "raw", "source": "polaroid__1960.svg", "wiki_host": "commons", "wiki_title": "File:Polaroid-1960.svg", "color_mode": "ink"},
+    {"brand_id": "polaroid", "era_id": "2017", "mode": "raw", "source": "polaroid__2017.svg", "wiki_host": "commons", "wiki_title": "File:Polaroid Originals logo.svg", "color_mode": "ink"},
+    {"brand_id": "polaroid", "era_id": "2020", "mode": "raw", "source": "polaroid__2020.svg", "wiki_host": "commons", "wiki_title": "File:Polaroid Logo 2020.svg", "color_mode": "ink"},
+
+    {"brand_id": "phase-one", "era_id": "1993", "mode": "raw", "source": "phase-one__1993.svg", "wiki_host": "commons", "wiki_title": "File:Phase One logo.svg", "color_mode": "ink", "gray_to_muted": true},
+    {"brand_id": "mamiya", "era_id": "1940", "mode": "raw", "source": "mamiya__1940.svg", "wiki_host": "commons", "wiki_title": "File:Mamiya logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "contax", "era_id": "1974", "mode": "retained", "source": "contax/1974.svg", "color_mode": "ink"},
+    {"brand_id": "casio", "era_id": "1972", "mode": "raw", "source": "casio__1972.svg", "wiki_host": "commons", "wiki_title": "File:Casio logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "epson", "era_id": "1994", "mode": "raw", "source": "epson__1994.svg", "wiki_host": "commons", "wiki_title": "File:Epson logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "kyocera", "era_id": "1982", "mode": "raw", "source": "kyocera__1982.svg", "wiki_host": "commons", "wiki_title": "File:Kyocera logo.svg", "color_mode": "ink"},
+    {"brand_id": "yashica", "era_id": "1983", "mode": "raw", "source": "yashica__1983.svg", "wiki_host": "commons", "wiki_title": "File:YASHICA LOGO.svg", "color_mode": "ink"},
+    {"brand_id": "rollei", "era_id": "1962", "mode": "raw", "source": "rollei__1962.svg", "wiki_host": "commons", "wiki_title": "File:Rollei-Logo.svg", "color_mode": "ink"},
+    {"brand_id": "zeiss", "era_id": "1991", "mode": "raw", "source": "zeiss__1991.svg", "wiki_host": "commons", "wiki_title": "File:Zeiss logo.svg", "color_mode": "badge"},
+    {"brand_id": "pixii", "era_id": "2017", "mode": "retained", "source": "pixii/2017.svg", "color_mode": "ink"},
+    {"brand_id": "red", "era_id": "2005", "mode": "retained", "source": "red/2005.svg", "color_mode": "badge"},
+    {"brand_id": "arri", "era_id": "2010", "mode": "raw", "source": "arri__2010.svg", "wiki_host": "commons", "wiki_title": "File:Arri logo.svg", "color_mode": "ink"},
+    {"brand_id": "blackmagic", "era_id": "2001", "mode": "derived", "source": "blackmagic_2001", "wiki_host": "en", "wiki_title": "File:Blackmagic Design logo.svg", "color_mode": "ink", "gray_to_muted": true},
+
+    {"brand_id": "apple", "era_id": "1977", "mode": "raw", "source": "apple__1977.svg", "wiki_host": "commons", "wiki_title": "File:Apple Computer Logo rainbow.svg", "color_mode": "badge"},
+    {"brand_id": "apple", "era_id": "2007", "mode": "raw", "source": "apple__2007.svg", "wiki_host": "commons", "wiki_title": "File:Apple logo grey.svg", "color_mode": "badge"},
+    {"brand_id": "apple", "era_id": "2013", "mode": "raw", "source": "apple__2013.svg", "wiki_host": "commons", "wiki_title": "File:Apple logo black.svg", "color_mode": "ink"},
+
+    {"brand_id": "google", "era_id": "2010", "mode": "raw", "source": "google__2010.svg", "wiki_host": "commons", "wiki_title": "File:Google 2011 logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "google", "era_id": "2015", "mode": "raw", "source": "google__2015.svg", "wiki_host": "commons", "wiki_title": "File:Google 2015 logo.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "xiaomi", "era_id": "2014", "mode": "raw", "source": "xiaomi__2014.svg", "wiki_host": "commons", "wiki_title": "File:Xiaomi logo.svg", "color_mode": "badge"},
+    {"brand_id": "xiaomi", "era_id": "2021", "mode": "raw", "source": "xiaomi__2021.svg", "wiki_host": "commons", "wiki_title": "File:Xiaomi logo (2021-).svg", "color_mode": "badge"},
+
+    {"brand_id": "huawei", "era_id": "2006", "mode": "derived", "source": "huawei_2006", "wiki_host": "en", "wiki_title": "File:Huawei Standard logo.svg", "color_mode": "ink"},
+    {"brand_id": "huawei", "era_id": "2018", "mode": "derived", "source": "huawei_2018", "wiki_host": "en", "wiki_title": "File:Huawei wordmark 2019.svg", "color_mode": "ink"},
+
+    {"brand_id": "oppo", "era_id": "2013", "mode": "raw", "source": "oppo__2013.svg", "wiki_host": "commons", "wiki_title": "File:OPPO logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "oppo", "era_id": "2019", "mode": "raw", "source": "oppo__2019.svg", "wiki_host": "commons", "wiki_title": "File:OPPO LOGO 2019.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "vivo", "era_id": "2009", "mode": "raw", "source": "vivo__ch2.svg", "wiki_host": "commons", "wiki_title": "File:Vivo Logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "vivo", "era_id": "2019", "mode": "raw", "source": "vivo__2019.svg", "wiki_host": "commons", "wiki_title": "File:Vivo logo 2019.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "oneplus", "era_id": "2013", "mode": "derived", "source": "oneplus_2013", "wiki_host": "en", "wiki_title": "File:OP LU Reg 1L RGB red copy-01.svg", "color_mode": "brand_color"},
+    {"brand_id": "oneplus", "era_id": "2020", "mode": "raw", "source": "oneplus__2020_a.svg", "wiki_host": "en", "wiki_title": "File:OP LU Reg 1L RGB red copy-01.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "lg", "era_id": "1995", "mode": "raw", "source": "lg__3d.svg", "wiki_host": "commons", "wiki_title": "File:LG logo (2008–2014).svg", "color_mode": "ink", "gray_to_muted": true},
+    {"brand_id": "lg", "era_id": "2014", "mode": "raw", "source": "lg__2014.svg", "wiki_host": "commons", "wiki_title": "File:LG logo (2014).svg", "color_mode": "ink", "gray_to_muted": true},
+    {"brand_id": "lg", "era_id": "2023", "mode": "derived", "source": "lg_2023", "wiki_host": "commons", "wiki_title": "File:LG logo (2014).svg", "color_mode": "ink", "gray_to_muted": true},
+
+    {"brand_id": "goldstar", "era_id": "1983", "mode": "raw", "source": "goldstar__hangul.svg", "wiki_host": "commons", "wiki_title": "File:GoldStar Logo (Hangul).svg", "color_mode": "ink"},
+    {"brand_id": "sony-ericsson", "era_id": "2001", "mode": "raw", "source": "sony-ericsson__2001.svg", "wiki_host": "en", "wiki_title": "File:Sony Ericsson.svg", "color_mode": "ink", "gray_to_muted": true},
+
+    {"brand_id": "motorola", "era_id": "1955", "mode": "raw", "source": "motorola__1955.svg", "wiki_host": "commons", "wiki_title": "File:Motorola-Logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "motorola", "era_id": "2013", "mode": "raw", "source": "motorola__2013.svg", "wiki_host": "commons", "wiki_title": "File:Motorola new logo.svg", "color_mode": "ink"},
+
+    {"brand_id": "nokia", "era_id": "1992", "mode": "raw", "source": "nokia__1992.svg", "wiki_host": "commons", "wiki_title": "File:Nokia wordmark.svg", "color_mode": "brand_color"},
+    {"brand_id": "nokia", "era_id": "2023", "mode": "raw", "source": "nokia__2023.svg", "wiki_host": "commons", "wiki_title": "File:Nokia 2023.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "honor", "era_id": "2013", "mode": "raw", "source": "honor__2013.svg", "wiki_host": "commons", "wiki_title": "File:Huawei Honor Logo.svg", "color_mode": "ink"},
+    {"brand_id": "honor", "era_id": "2018", "mode": "raw", "source": "honor__2018.svg", "wiki_host": "commons", "wiki_title": "File:Honor Logo (2020).svg", "color_mode": "ink"},
+
+    {"brand_id": "realme", "era_id": "2018", "mode": "raw", "source": "realme__2018.svg", "wiki_host": "commons", "wiki_title": "File:Realme logo.svg", "color_mode": "badge"},
+    {"brand_id": "nothing", "era_id": "2020", "mode": "raw", "source": "nothing__dot.svg", "wiki_host": "commons", "wiki_title": "File:Nothing.svg", "color_mode": "ink"},
+    {"brand_id": "asus", "era_id": "1995", "mode": "raw", "source": "asus__neu.svg", "wiki_host": "commons", "wiki_title": "File:ASUS Logo-neu.svg", "color_mode": "brand_color", "default_fill": "#00539B"},
+    {"brand_id": "htc", "era_id": "2008", "mode": "raw", "source": "htc__2008.svg", "wiki_host": "en", "wiki_title": "File:HTC.svg", "color_mode": "brand_color"},
+    {"brand_id": "sharp", "era_id": "1960", "mode": "raw", "source": "sharp__1960.svg", "wiki_host": "commons", "wiki_title": "File:Sharp logo.svg", "color_mode": "brand_color"},
+    {"brand_id": "blackberry", "era_id": "2004", "mode": "raw", "source": "blackberry__2004.svg", "wiki_host": "commons", "wiki_title": "File:Blackberry Logo.svg", "color_mode": "ink"},
+    {"brand_id": "pantech", "era_id": "2005", "mode": "raw", "source": "pantech__2005.svg", "wiki_host": "commons", "wiki_title": "File:Pantech Logo.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "gopro", "era_id": "2004", "mode": "derived", "source": "gopro_2004", "wiki_host": "commons", "wiki_title": "File:GoPro logo light.svg", "color_mode": "ink"},
+    {"brand_id": "gopro", "era_id": "2012", "mode": "raw", "source": "gopro__2004_a.svg", "wiki_host": "commons", "wiki_title": "File:GoPro logo light.svg", "color_mode": "ink"},
+
+    {"brand_id": "dji", "era_id": "2006", "mode": "retained", "source": "dji/2006.svg", "color_mode": "brand_color"},
+    {"brand_id": "dji", "era_id": "2012", "mode": "raw", "source": "dji__2012.svg", "wiki_host": "commons", "wiki_title": "File:DJI Innovations logo.svg", "color_mode": "brand_color"},
+
+    {"brand_id": "insta360", "era_id": "2015", "mode": "retained", "source": "insta360/2015.svg", "color_mode": "ink"},
+    {"brand_id": "insta360", "era_id": "2020", "mode": "raw", "source": "insta360__2020.svg", "wiki_host": "commons", "wiki_title": "File:Insta360 logo (transparent).svg", "color_mode": "ink"},
+
+    {"brand_id": "ricoh-theta", "era_id": "2013", "mode": "derived", "source": "ricoh_theta_2013", "wiki_host": "commons", "wiki_title": "File:Ricoh logo 2005.svg", "color_mode": "ink"},
+    {"brand_id": "garmin", "era_id": "2006", "mode": "raw", "source": "garmin__2006.svg", "wiki_host": "commons", "wiki_title": "File:Garmin logo 2006.svg", "color_mode": "ink"},
+    {"brand_id": "autel", "era_id": "2014", "mode": "raw", "source": "autel__2014.svg", "wiki_host": "en", "wiki_title": "File:Autel Robotics Logo.svg", "color_mode": "ink"},
+    {"brand_id": "parrot", "era_id": "1994", "mode": "raw", "source": "parrot__1994.svg", "wiki_host": "commons", "wiki_title": "File:Parrot-logo.svg", "color_mode": "ink"},
+    {"brand_id": "sjcam", "era_id": "2010", "mode": "retained", "source": "sjcam/2010.svg", "color_mode": "brand_color"},
+    {"brand_id": "akaso", "era_id": "2013", "mode": "retained", "source": "akaso/2013.svg", "color_mode": "ink"}
+  ]
+}

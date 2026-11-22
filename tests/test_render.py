@@ -394,6 +394,78 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(svg_res["brand_info"]["logo_source"], "user_override")
         self.assertTrue(Path(svg_res["output_path"]).is_file())
 
+    def test_strap_right_aligned_dynamic_cluster_and_no_stray_dash(self):
+        sony_out = self.folder / "sony_strap_empty_lens.png"
+        sony_job = dict(
+            self.job,
+            theme="strap",
+            appearance="light",
+            format="png",
+            bit_depth=8,
+            output_path=str(sony_out),
+            metadata={
+                "make": "SONY",
+                "model": "DSC-P200",
+                "lens": "",
+                "iso": "100",
+                "focal": "7.9",
+                "focal35": "38",
+                "aperture": "2.8",
+                "shutter": "1/40",
+                "date": "2026:11:21 13:48:15",
+            },
+        )
+        sony_res = renderer.render(sony_job)
+        self.assertTrue(sony_res["ok"])
+        self.assertEqual(sony_res["brand_info"]["brand_id"], "sony")
+        self.assertEqual(sony_res["brand_info"]["era_id"], "1973")
+
+        band_w, band_h = 384, 28
+        pixels = self.raw(sony_out, f"{band_w}x{band_h}+0+256", depth=8)
+
+        def is_ink(x: int, y: int) -> bool:
+            idx = (y * band_w + x) * 3
+            return pixels[idx] < 240 or pixels[idx + 1] < 240 or pixels[idx + 2] < 240
+
+        # Right cluster ([SONY] | [SONY DSC-P200]) must sit near the right edge, leaving center clear.
+        right_edge_ink = any(is_ink(x, y) for y in range(band_h) for x in range(340, 380))
+        self.assertTrue(right_edge_ink, "Right-aligned camera cluster was not flushed near right margin")
+        center_ink = any(is_ink(x, y) for y in range(band_h) for x in range(155, 215))
+        self.assertFalse(center_ink, "Center band unexpectedly occupied instead of keeping dynamic right-aligned gap")
+
+        # Identify the vertical divider column on the right side (spans >= 70% of band height).
+        divider_cols = [
+            x for x in range(250, band_w)
+            if sum(1 for y in range(band_h) if is_ink(x, y)) >= int(band_h * 0.65)
+        ]
+        self.assertTrue(divider_cols, "Expected vertical divider between logo and right camera label")
+        after_div = max(divider_cols) + 2
+        # With empty lens, no secondary '—' dash may appear in the bottom half to the right of the divider.
+        lower_right_ink = any(is_ink(x, y) for y in range(17, band_h) for x in range(after_div, band_w))
+        self.assertFalse(lower_right_ink, "Stray secondary dash/text appeared below model when lens is empty")
+
+        # 2-line Nikon case renders cleanly and does populate the lower-right sub-row beside the divider.
+        nikon_out = self.folder / "nikon_strap_two_line.png"
+        nikon_job = dict(
+            sony_job,
+            output_path=str(nikon_out),
+            metadata={
+                "make": "NIKON CORPORATION",
+                "model": "NIKON Z 8",
+                "lens": "NIKKOR Z 50mm f/1.8 S",
+                "iso": "64",
+                "focal": "50",
+                "focal35": "50",
+                "aperture": "1.8",
+                "shutter": "1/500",
+                "date": "2025:05:10 14:22:00",
+            },
+        )
+        nikon_res = renderer.render(nikon_job)
+        self.assertTrue(nikon_res["ok"])
+        self.assertEqual(nikon_res["brand_info"]["brand_id"], "nikon")
+        self.assertEqual(nikon_res["brand_info"]["era_id"], "2003")
+
 
 if __name__ == "__main__":
     unittest.main()

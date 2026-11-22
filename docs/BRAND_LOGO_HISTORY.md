@@ -4,7 +4,7 @@
 
 ## 1. 핵심 설계 원칙
 
-1. **Pure Vector Geometry (시스템 폰트 미사용)**: 모든 내장 CI 로고는 순수 기하학 SVG 경로(`<path>`, `<rect>`, `<circle>`, `<ellipse>`, `<polygon>`)로 제작하여 OS/폰트 의존 없이 임의 해상도에서 선명하게 렌더링한다.
+1. **Pure Vector Geometry (시스템 폰트·래스터 미사용)**: 모든 내장 CI 로고는 공식 브랜드 벡터 마크 원형(`scripts/logo_sources.json` · `scripts/fetch_official_logos.py`)을 기반으로 `<text>`/`<image>` 없는 순수 기하학 SVG 경로(`<path>`, `<rect>`, `<circle>`, `<ellipse>`, `<polygon>`)로 정규화하고 알파 바운딩 박스 기준 `viewBox` 크롭을 적용하여 OS/폰트 의존 없이 임의 해상도에서 선명하게 렌더링한다.
 2. **Release Year vs Capture Year**: 로고 시대는 **촬영 일시(`DateTimeOriginal`)가 아니라 카메라/스마트폰 기종의 출시·생산 연도**를 기준으로 판정한다. (예: 2012년 출시 Galaxy S3로 2025년에 촬영했더라도 2012년형 Blue Oval CI 사용).
 3. **Unknown Model Fallback**: 데이터베이스와 코드 규칙에서 출시 연도를 판정할 수 없는 미등록·신형 기종은 **반드시 해당 브랜드의 최신 CI**를 사용한다. (`DateTimeOriginal`은 출시 연도 폴백으로 사용하지 않는다.)
 4. **Make / Model 교차 판정 규칙**:
